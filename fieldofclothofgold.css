@@ -61,9 +61,9 @@
     position: absolute;
     background-image: url('img/tokens.png');
 }
-.tokencolor_ff0000 { background-position: 80px 0px; }
-.tokencolor_0000ff { background-position: 120px 0px; }
-.tokencolor_ffffff { background-position: 40px 0px; }
+.token_ff0000 { background-position: 80px 0px; }
+.token_0000ff { background-position: 120px 0px; }
+.token_ffffff { background-position: 40px 0px; }
 
 .tile {
     width: 56px;
@@ -71,11 +71,11 @@
     position: absolute;
     background-image: url('img/tokens.png');
 }
-.tilecolor_0000ff { background-position: 0px 0px; }
-.tilecolor_ff0000 { background-position: -56px 0px; }
-.tilecolor_ffff00 { background-position: -112px 0px; }
-.tilecolor_ffffff { background-position: -168px 0px; }
-.tilecolor_00ff00 { background-position: -224px 0px; }
+.tile_0000ff { background-position: 0px 0px; }
+.tile_ff0000 { background-position: -56px 0px; }
+.tile_ffff00 { background-position: -112px 0px; }
+.tile_ffffff { background-position: -168px 0px; }
+.tile_00ff00 { background-position: -224px 0px; }
 
 
 /*
