@@ -48,6 +48,35 @@
 
 /********* You can start writing your CSS below this line: **********/
 
+#board {
+    width: 730px;
+    height: 450px;
+    background-image: url('img/board.jpg');
+    position: relative;
+}
+
+.token {
+    width: 40px;
+    height: 56px;
+    position: absolute;
+    background-image: url('img/tokens.png');
+}
+.tokencolor_ff0000 { background-position: 80px 0px; }
+.tokencolor_0000ff { background-position: 120px 0px; }
+.tokencolor_ffffff { background-position: 40px 0px; }
+
+.tile {
+    width: 56px;
+    height: 56px;
+    position: absolute;
+    background-image: url('img/tokens.png');
+}
+.tilecolor_0000ff { background-position: 0px 0px; }
+.tilecolor_ff0000 { background-position: -56px 0px; }
+.tilecolor_ffff00 { background-position: -112px 0px; }
+.tilecolor_ffffff { background-position: -168px 0px; }
+.tilecolor_00ff00 { background-position: -224px 0px; }
+
 
 /*
     Example of CSS sprites (a black token and a white token, 20x20px each, embedded in the same "tokens.png" 40x20px image):
