@@ -29,6 +29,16 @@
 This is your game interface. You can edit this HTML in your ".tpl" file.
 
 <div id="board">
+    <div id="oval_space_dragon" class="oval" style="left: 69px; top: 80px;"></div>
+
+    <!-- BEGIN oval -->
+        <div id="oval_{X}" class="oval" style="left: {LEFT}px; top: {TOP}px;"></div>
+    <!-- END oval -->
+
+    <!-- BEGIN square -->
+    <div id="square_{X}" class="square" style="left: {LEFT}px; top: {TOP}px;"></div>
+    <!-- END square -->
+    
 </div>
 
 <script type="text/javascript">

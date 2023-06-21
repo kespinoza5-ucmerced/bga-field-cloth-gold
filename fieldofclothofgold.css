@@ -55,6 +55,23 @@
     position: relative;
 }
 
+.oval {
+    width: 36px;
+    height: 26px;
+    border-radius: 50%;
+    position: absolute;
+    border-style: solid;
+    border-color: #ff0000;
+}
+
+.square {
+    width: 36px;
+    height: 36px;
+    position: absolute;
+    border-style: solid;
+    border-color: #ff0000;
+}
+
 .token {
     width: 40px;
     height: 56px;

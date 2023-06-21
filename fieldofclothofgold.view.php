@@ -41,7 +41,29 @@ class view_fieldofclothofgold_fieldofclothofgold extends game_view
         $players_nbr = count( $players );
 
         /*********** Place your code below:  ************/
+        $this->page->begin_block( "fieldofclothofgold_fieldofclothofgold", "oval" );
 
+        $hor_scale = 87;
+        for ( $x=0; $x<7; $x++ )
+        {
+            $this->page->insert_block( "oval", array(
+                'X' => $x,
+                'LEFT' => round( ($x)*$hor_scale+69 ),
+                'TOP' => 118
+            ));
+        }
+
+        $this->page->begin_block( "fieldofclothofgold_fieldofclothofgold", "square" );
+
+        $hor_scale = 87;
+        for ( $x=1; $x<=6; $x++ )
+        {
+            $this->page->insert_block( "square", array(
+                'X' => $x,
+                'LEFT' => round( ($x)*$hor_scale+69 ),
+                'TOP' => 159
+            ));
+        }
 
         /*
         
