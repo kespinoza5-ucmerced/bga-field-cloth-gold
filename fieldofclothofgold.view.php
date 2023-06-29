@@ -41,7 +41,19 @@ class view_fieldofclothofgold_fieldofclothofgold extends game_view
         $players_nbr = count( $players );
 
         /*********** Place your code below:  ************/
-        $this->page->begin_block( "fieldofclothofgold_fieldofclothofgold", "oval" );
+        $template = self::getGameName() . "_" . self::getGameName();
+
+        $this->page->begin_block( $template, "player" );
+        foreach ( $players as $player_id => $info ) {
+            $this->page->insert_block("player", array ("PLAYER_ID" => $player_id,
+                    "PLAYER_NAME" => $players [$player_id] ['player_name'],
+                    "PLAYER_COLOR" => $players [$player_id] ['player_color']));
+        }
+
+        // this will make our My Hand text translatable
+        $this->tpl['MY_HAND'] = self::_("My hand");
+
+        $this->page->begin_block( $template, "oval" );
 
         $hor_scale = 87;
         for ( $x=0; $x<7; $x++ )

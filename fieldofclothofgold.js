@@ -18,7 +18,8 @@
 define([
     "dojo","dojo/_base/declare",
     "ebg/core/gamegui",
-    "ebg/counter"
+    "ebg/counter",
+    "ebg/stock"
 ],
 function (dojo, declare) {
     return declare("bgagame.fieldofclothofgold", ebg.core.gamegui, {
@@ -29,6 +30,9 @@ function (dojo, declare) {
             // Example:
             // this.myGlobalValue = 0;
 
+            console.log('hearts constructor');
+            this.cardwidth = 56;
+            this.cardheight = 56;
         },
         
         /*
@@ -47,6 +51,7 @@ function (dojo, declare) {
         setup: function( gamedatas )
         {
             console.log( "Starting game setup" );
+            console.log('here it is ',this)
             
             // Setting up player boards
             for( var player_id in gamedatas.players )
@@ -58,6 +63,29 @@ function (dojo, declare) {
             
             // TODO: Set up your game interface here, according to "gamedatas"
             
+            // Player hand
+            // console.log('here is this',this)
+            this.playerHand = new ebg.stock(); // new stock object for hand
+            this.playerHand.create( this, $('myhand'), this.cardwidth, this.cardheight );
+
+            this.playerHand.image_items_per_row = 5;
+
+            let counter = 0
+            // Create cards types:
+            for (tile of this.gamedatas.tiles) {
+                var card_type_id = counter;
+                var sprite_position = tile.sprite_position
+                this.playerHand.addItemType(card_type_id, card_type_id, g_gamethemeurl + 'img/tokens.png', sprite_position);
+                counter++;
+            }
+
+            this.playerHand.addToStockWithId( 13, 13 );
+            this.playerHand.addToStockWithId( 25, 25 );
+            this.playerHand.addToStockWithId( 11, 11 );
+
+            // hook up player hand ??
+            dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
+
  
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -172,6 +200,26 @@ function (dojo, declare) {
             _ make a call to the game server
         
         */
+
+        onPlayerHandSelectionChanged: function() {
+            var items = this.playerHand.getSelectedItems();
+
+            if (items.length > 0) {
+                if (this.checkAction('playCard', true)) {
+                    // Can play a card
+
+                    var card_id = items[0].id;
+                    console.log("on playCard "+card_id);
+
+                    this.playerHand.unselectAll();
+                } else if (this.checkAction('giveCards')) {
+                    // Can give cards => let the player select some cards
+                } else {
+                    this.playerHand.unselectAll();
+                }
+            }
+        },
+    
         
         /* Example:
         

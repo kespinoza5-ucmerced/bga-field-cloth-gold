@@ -28,6 +28,24 @@
 
 This is your game interface. You can edit this HTML in your ".tpl" file.
 
+<div id="playertables">
+
+    <!-- BEGIN player -->
+    <div class="playertable whiteblock playertable_{PLAYER_ID}">
+        <div class="playertablename" style="color:#{PLAYER_COLOR}">
+            {PLAYER_NAME}
+        </div>
+    </div>
+    <!-- END player -->
+
+</div>
+
+<div id="myhand_wrap" class="whiteblock">
+    <h3>{MY_HAND}</h3>
+    <div id="myhand">
+    </div>
+</div>
+
 <div id="board">
     <div id="oval_space_dragon" class="oval" style="left: 69px; top: 80px;"></div>
 
