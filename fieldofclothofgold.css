@@ -82,18 +82,18 @@
 .token_0000ff { background-position: 120px 0px; }
 .token_ffffff { background-position: 40px 0px; }
 
-.tile {
-    width: 56px;
-    height: 56px;
-    position: absolute;
-    background-image: url('img/tokens.png');
+#playertables {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
 }
-.tile_0000ff { background-position: 0px 0px; }
-.tile_ff0000 { background-position: -56px 0px; }
-.tile_ffff00 { background-position: -112px 0px; }
-.tile_ffffff { background-position: -168px 0px; }
-.tile_00ff00 { background-position: -224px 0px; }
 
+.playertable {
+    width: 45%;
+    height: 100%;
+    display: flex;
+    justify-content: left;
+}
 
 /*
     Example of CSS sprites (a black token and a white token, 20x20px each, embedded in the same "tokens.png" 40x20px image):
