@@ -70,22 +70,35 @@ function (dojo, declare) {
 
             this.playerHand.image_items_per_row = 5;
 
-            let counter = 0
             // Create cards types:
-            for (tile of this.gamedatas.tiles) {
-                var card_type_id = counter;
-                var sprite_position = tile.sprite_position
-                this.playerHand.addItemType(card_type_id, card_type_id, g_gamethemeurl + 'img/tokens.png', sprite_position);
-                counter++;
+            for ( const tile in this.gamedatas.tiles ) {
+                let tile_id = tile.id;
+                let sprite_position = tile.sprite_position
+                this.playerHand.addItemType(tile_id, tile_id, g_gamethemeurl + 'img/tokens.png', sprite_position);
             }
-
-            this.playerHand.addToStockWithId( 13, 13 );
-            this.playerHand.addToStockWithId( 25, 25 );
-            this.playerHand.addToStockWithId( 11, 11 );
 
             // hook up player hand ??
             dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
 
+            // Cards in player's hand
+            for ( var i in this.gamedatas.hand ) {
+                var tile = this.gamedatas.hand[i];
+                this.playerHand.addToStockWithId(tile.id, tile.stock_id);
+                // should we remove from deck stock now?
+                // ~~~~~~
+
+                console.log('this is the id for card ', tile.id, tile.stock_id)
+            }
+
+            // Cards played on table
+            for ( i in this.gamedatas.cardsontable ) {
+                var tile = this.gamedatas.tilesontable[i];
+                var player_id = card.location_arg;
+                this.playCardOnTable(player_id, tile.id, tile.stock_id);
+            }
+
+            // In any case: move it to its final destination
+            this.slideToObject('cardontable_' + player_id, 'playertablecard_' + player_id).play();
  
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -186,6 +199,30 @@ function (dojo, declare) {
         
         */
 
+        playTileOnTable : function(player_id, color, card_id) {
+            // player_id => direction
+            dojo.place(this.format_block('jstpl_tileontable', {
+                x : this.cardwidth * (color - 1),
+                player_id : player_id
+            }), 'playertabletile_' + player_id);
+
+            if (player_id != this.player_id) {
+                // Some opponent played a card
+                // Move card from player panel
+                this.placeOnObject('cardontable_' + player_id, 'overall_player_board_' + player_id);
+            } else {
+                // You played a card. If it exists in your hand, move card from there and remove
+                // corresponding item
+
+                if ($('myhand_item_' + card_id)) {
+                    this.placeOnObject('cardontable_' + player_id, 'myhand_item_' + card_id);
+                    this.playerHand.removeFromStockById(card_id);
+                }
+            }
+
+            // In any case: move it to its final destination
+            this.slideToObject('cardontable_' + player_id, 'playertablecard_' + player_id).play();
+        },
 
         ///////////////////////////////////////////////////
         //// Player's action
