@@ -72,8 +72,8 @@ function (dojo, declare) {
 
             // Create cards types:
             for ( const tile in this.gamedatas.tiles ) {
-                let tile_id = tile.id;
-                let sprite_position = tile.sprite_position
+                let tile_id = tile;
+                let sprite_position = this.gamedatas.tiles[tile].sprite_position;
                 this.playerHand.addItemType(tile_id, tile_id, g_gamethemeurl + 'img/tokens.png', sprite_position);
             }
 
