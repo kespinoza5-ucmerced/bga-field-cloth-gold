@@ -85,15 +85,15 @@ class fieldofclothofgold extends Table
         // Set current reveal color to zero (= no reveal color)
         self::setGameStateInitialValue( 'revealColor', 0 );
 
-        // Create cards
-        $tiles = array ();
-        $this->testings = array();
-        $this->testings [] = array (1, 2, 3);
-        // foreach ( $this->tiles as $tile ) {
-        //     $this->testings [] = $tile;
-        // }
+        // // Create cards
+        // $tiles = array ();
+        // $this->testings = array();
+        // $this->testings [] = array (1, 2, 3);
+        // // foreach ( $this->tiles as $tile ) {
+        // //     $this->testings [] = $tile;
+        // // }
         
-        $this->tiles->createCards( $tiles, 'sack' );
+        // $this->tiles->createCards( $tiles, 'sack' );
         
 
         
@@ -133,7 +133,7 @@ class fieldofclothofgold extends Table
         $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb( $sql );
         $result['tiles'] = $this->tiles;
-        $result['testings'] = $this->testings;
+        // $result['testings'] = $this->testings;
   
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
   
