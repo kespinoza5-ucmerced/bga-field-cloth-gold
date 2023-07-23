@@ -31,15 +31,14 @@ class fieldofclothofgold extends Table
         //  the corresponding ID in gameoptions.inc.php.
         // Note: afterwards, you can get/set the global variables with getGameStateValue/setGameStateInitialValue/setGameStateValue
         parent::__construct();
-        
+       
         self::initGameStateLabels( array( 
-            //    "my_first_global_variable" => 10,
-            //    "my_second_global_variable" => 11,
-            //      ...
-            //    "my_first_game_variant" => 100,
-            //    "my_second_game_variant" => 101,
-            //      ...
-        ) );        
+            "dragonIsOnHomeSpace" => 10, 
+            "revealColor" => 11,
+        ) );
+
+        $this->cards = self::getNew( "module.common.deck" );
+        $this->cards->init( "tile" );     
 	}
 	
     protected function getGameName( )
@@ -81,6 +80,22 @@ class fieldofclothofgold extends Table
 
         // Init global values with their initial values
         //self::setGameStateInitialValue( 'my_first_global_variable', 0 );
+        self::setGameStateInitialValue( 'dragonIsOnHomeSpace', true );
+        
+        // Set current reveal color to zero (= no reveal color)
+        self::setGameStateInitialValue( 'revealColor', 0 );
+
+        // Create cards
+        $tiles = array ();
+        $this->testings = array();
+        $this->testings [] = array (1, 2, 3);
+        // foreach ( $this->tiles as $tile ) {
+        //     $this->testings [] = $tile;
+        // }
+        
+        $this->tiles->createCards( $tiles, 'sack' );
+        
+
         
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -88,6 +103,8 @@ class fieldofclothofgold extends Table
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
         // TODO: setup the initial game situation here
+
+
        
 
         // Activate first player (which is in general a good idea :) )
@@ -116,6 +133,7 @@ class fieldofclothofgold extends Table
         $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb( $sql );
         $result['tiles'] = $this->tiles;
+        $result['testings'] = $this->testings;
   
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
   

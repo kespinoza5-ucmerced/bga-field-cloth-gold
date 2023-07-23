@@ -77,28 +77,28 @@ function (dojo, declare) {
                 this.playerHand.addItemType(tile_id, tile_id, g_gamethemeurl + 'img/tokens.png', sprite_position);
             }
 
-            // hook up player hand ??
-            dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
+            // // hook up player hand ??
+            // dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
 
-            // Cards in player's hand
-            for ( var i in this.gamedatas.hand ) {
-                var tile = this.gamedatas.hand[i];
-                this.playerHand.addToStockWithId(tile.id, tile.stock_id);
-                // should we remove from deck stock now?
-                // ~~~~~~
+            // // Cards in player's hand
+            // for ( var i in this.gamedatas.hand ) {
+            //     var tile = this.gamedatas.hand[i];
+            //     this.playerHand.addToStockWithId(tile.id, tile.stock_id);
+            //     // should we remove from deck stock now?
+            //     // ~~~~~~
 
-                console.log('this is the id for card ', tile.id, tile.stock_id)
-            }
+            //     console.log('this is the id for card ', tile.id, tile.stock_id)
+            // }
 
-            // Cards played on table
-            for ( i in this.gamedatas.cardsontable ) {
-                var tile = this.gamedatas.tilesontable[i];
-                var player_id = card.location_arg;
-                this.playCardOnTable(player_id, tile.id, tile.stock_id);
-            }
+            // // Cards played on table
+            // for ( i in this.gamedatas.cardsontable ) {
+            //     var tile = this.gamedatas.tilesontable[i];
+            //     var player_id = card.location_arg;
+            //     this.playCardOnTable(player_id, tile.id, tile.stock_id);
+            // }
 
-            // In any case: move it to its final destination
-            this.slideToObject('cardontable_' + player_id, 'playertablecard_' + player_id).play();
+            // // In any case: move it to its final destination
+            // this.slideToObject('cardontable_' + player_id, 'playertablecard_' + player_id).play();
  
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
