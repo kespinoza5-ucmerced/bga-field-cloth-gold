@@ -22,7 +22,7 @@
 
 CREATE TABLE IF NOT EXISTS `tile` (
   `tile_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `tile_type` varchar(16) NOT NULL,
+  `tile_color` varchar(16) NOT NULL,
   `tile_location` varchar(16) NOT NULL,
   `tile_location_arg` int(11) NOT NULL,
   PRIMARY KEY (`tile_id`)
