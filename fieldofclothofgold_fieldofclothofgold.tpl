@@ -62,6 +62,9 @@ This is your game interface. You can edit this HTML in your ".tpl" file.
 <script type="text/javascript">
 
 // Javascript HTML templates
+var jstpl_cardontable = '<div class="cardontable" id="cardontable_${player_id}" style="background-position:-${x}px -${y}px">\
+                        </div>';
+
 
 /*
 // Example:
