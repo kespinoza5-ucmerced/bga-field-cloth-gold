@@ -37,8 +37,8 @@ class fieldofclothofgold extends Table
             "revealColor" => 11,
         ) );
 
-        $this->cards = self::getNew( "module.common.deck" );
-        $this->cards->init( "tile" );     
+        $this->sack = self::getNew( "module.common.deck" );
+        $this->sack->init( "card" );
 	}
 	
     protected function getGameName( )
@@ -85,17 +85,15 @@ class fieldofclothofgold extends Table
         // Set current reveal color to zero (= no reveal color)
         self::setGameStateInitialValue( 'revealColor', 0 );
 
-        // // Create cards
-        // $tiles = array ();
-        // // $this->testings = array();
-        // // $this->testings [] = array (1, 2, 3);
-        // foreach ( $this->tiles as $tile ) {
-        //     $this->testings [] = $tile;
-        // }
-        
-        // $this->tiles->createCards( $tiles, 'sack' );
-        
+        // Create tiles
+        $tiles = array ();
 
+        foreach( $this->tiles as $tile )
+        {
+            $tiles [] = array ('type' => $tile['color']['name'],'type_arg' => 0,'nbr' => 1 );
+        }
+        
+        $this->sack->createCards( $tiles, 'deck' );
         
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -134,6 +132,7 @@ class fieldofclothofgold extends Table
         $result['players'] = self::getCollectionFromDb( $sql );
         $result['tiles'] = $this->tiles;
         $result['tile_types'] = $this->colors;
+        $result['sack'] = $this->sack;
   
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
   

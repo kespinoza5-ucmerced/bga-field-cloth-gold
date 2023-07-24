@@ -76,8 +76,8 @@ function (dojo, declare) {
                 this.playerHand.addItemType(color_id, color_id, g_gamethemeurl + 'img/tokens.png', sprite_position);
             }
 
-            // // hook up player hand ??
-            // dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
+            // hook up player hand ??
+            dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
 
             // // Cards in player's hand
             // for ( var i in this.gamedatas.hand ) {
