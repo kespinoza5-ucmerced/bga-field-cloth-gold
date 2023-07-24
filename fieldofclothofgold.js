@@ -71,10 +71,9 @@ function (dojo, declare) {
             this.playerHand.image_items_per_row = 5;
 
             // Create cards types:
-            for ( const tile in this.gamedatas.tiles ) {
-                let tile_id = tile;
-                let sprite_position = this.gamedatas.tiles[tile].sprite_position;
-                this.playerHand.addItemType(tile_id, tile_id, g_gamethemeurl + 'img/tokens.png', sprite_position);
+            for ( const color_id in this.gamedatas.tile_types ) {
+                let sprite_position = this.gamedatas.tiles[color_id].sprite_position;
+                this.playerHand.addItemType(color_id, color_id, g_gamethemeurl + 'img/tokens.png', sprite_position);
             }
 
             // // hook up player hand ??
