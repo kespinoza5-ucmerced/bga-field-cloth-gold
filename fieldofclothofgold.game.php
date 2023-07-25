@@ -94,6 +94,14 @@ class fieldofclothofgold extends Table
         }
         
         $this->sack->createCards( $tiles, 'deck' );
+
+        // Shuffle deck
+        $this->sack->shuffle('deck');
+        // Deal 13 cards to each players
+        $players = self::loadPlayersBasicInfos();
+        foreach ( $players as $player_id => $player ) {
+            $tiles = $this->sack->pickCards(2, 'deck', $player_id);
+        }         
         
         // Init game statistics
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -135,6 +143,11 @@ class fieldofclothofgold extends Table
         $result['sack'] = $this->sack;
   
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
+        // Cards in player hand
+        $result['hand'] = $this->sack->getCardsInLocation( 'hand', $current_player_id );
+
+        // Cards played on the table
+        $result['tilesontable'] = $this->sack->getCardsInLocation( 'tilesontable' );
   
         return $result;
     }

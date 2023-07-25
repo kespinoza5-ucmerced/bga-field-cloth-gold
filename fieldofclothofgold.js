@@ -79,25 +79,25 @@ function (dojo, declare) {
             // hook up player hand ??
             dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
 
-            // // Cards in player's hand
-            // for ( var i in this.gamedatas.hand ) {
-            //     var tile = this.gamedatas.hand[i];
-            //     this.playerHand.addToStockWithId(tile.id, tile.stock_id);
-            //     // should we remove from deck stock now?
-            //     // ~~~~~~
+            console.log('here is gamedatas ', this.gamedatas)
+            console.log('here is hand ',this.gamedatas.hand);
+            console.log('here is cardsontable ',this.gamedatas.cardsontable);
 
-            //     console.log('this is the id for card ', tile.id, tile.stock_id)
-            // }
+            // Cards in player's hand
+            for ( let i in this.gamedatas.hand ) {
+                let tile = this.gamedatas.hand[i];
+                console.log('tile ', tile)
+                console.log('add to stock with id: ', tile.type, this.getTileUniqueType(tile.type), tile.id)
+                // should be addToStockWithId(item_type, db_id)
+                this.playerHand.addToStockWithId(this.getTileUniqueType(tile.type), tile.id);
+            }
 
-            // // Cards played on table
-            // for ( i in this.gamedatas.cardsontable ) {
-            //     var tile = this.gamedatas.tilesontable[i];
-            //     var player_id = card.location_arg;
-            //     this.playCardOnTable(player_id, tile.id, tile.stock_id);
-            // }
-
-            // // In any case: move it to its final destination
-            // this.slideToObject('cardontable_' + player_id, 'playertablecard_' + player_id).play();
+            // Cards played on table
+            for ( i in this.gamedatas.cardsontable ) {
+                let tile = this.gamedatas.tilesontable[i];
+                let player_id = card.location_arg;
+                this.playCardOnTable(player_id, tile.id, tile.stock_id);
+            }
  
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -198,29 +198,49 @@ function (dojo, declare) {
         
         */
 
-        playTileOnTable : function(player_id, color, card_id) {
+        // Get card unique identifier based on its color and value
+        getTileUniqueType : function(color) {
+            // bl,r,go,wh,gr
+            if (color == 'blue') {
+                return 1;
+            } else if (color == 'red') {
+                return 2;
+            } else if (color == 'gold') {
+                return 3;
+            } else if (color == 'white') {
+                return 4;
+            } else if (color == 'green') {
+                return 5;
+            }
+
+            // means error
+            return -1;
+        },
+
+        playTileOnTable : function(player_id, color, tile_id) {
             // player_id => direction
             dojo.place(this.format_block('jstpl_tileontable', {
                 x : this.cardwidth * (color - 1),
+                tile_id : tile_id,
                 player_id : player_id
             }), 'playertabletile_' + player_id);
 
             if (player_id != this.player_id) {
                 // Some opponent played a card
                 // Move card from player panel
-                this.placeOnObject('cardontable_' + player_id, 'overall_player_board_' + player_id);
+                this.placeOnObject('tileontable_' + player_id, 'overall_player_board_' + player_id);
             } else {
                 // You played a card. If it exists in your hand, move card from there and remove
                 // corresponding item
 
-                if ($('myhand_item_' + card_id)) {
-                    this.placeOnObject('cardontable_' + player_id, 'myhand_item_' + card_id);
-                    this.playerHand.removeFromStockById(card_id);
+                if ($('myhand_item_' + tile_id)) {
+                    this.placeOnObject('tileontable_' + player_id, 'myhand_item_' + tile_id);
+                    this.playerHand.removeFromStockById(tile_id);
                 }
             }
 
             // In any case: move it to its final destination
-            this.slideToObject('cardontable_' + player_id, 'playertablecard_' + player_id).play();
+            this.slideToObject('tileontable_' + player_id, 'playertabletile_' + player_id).play();
         },
 
         ///////////////////////////////////////////////////
