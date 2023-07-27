@@ -53,18 +53,29 @@ function (dojo, declare) {
             console.log( "Starting game setup" );
             console.log('here it is ',this)
             
+            this.tableau = {};
+
             // Setting up player boards
             for( var player_id in gamedatas.players )
             {
                 var player = gamedatas.players[player_id];
-                         
+
                 // TODO: Setting up players boards if needed
+                this.tableau[player_id] = new ebg.stock();
+                this.tableau[player_id].create( this, $('playertabletile_'+player_id), this.cardwidth, this.cardheight );
+                this.tableau[player_id].autowidth = true;
+
+                this.tableau[player_id].image_items_per_row = 5;
+                
+                for ( const color_id in this.gamedatas.tile_types ) {
+                    let sprite_position = color_id - 1;
+                    this.tableau[player_id].addItemType(color_id, color_id, g_gamethemeurl + 'img/tokens.png', sprite_position);
+                }
             }
             
             // TODO: Set up your game interface here, according to "gamedatas"
             
             // Player hand
-            // console.log('here is this',this)
             this.playerHand = new ebg.stock(); // new stock object for hand
             this.playerHand.create( this, $('myhand'), this.cardwidth, this.cardheight );
 
@@ -89,7 +100,6 @@ function (dojo, declare) {
                 let tile = this.gamedatas.hand[i];
                 console.log('tile ', tile)
                 console.log('add to stock with id: ', tile.type, this.getTileUniqueType(tile.type), tile.id)
-                // should be addToStockWithId(item_type, db_id)
                 this.playerHand.addToStockWithId(this.getTileUniqueType(tile.type), tile.id);
             }
 
@@ -219,29 +229,19 @@ function (dojo, declare) {
         },
 
         playTileOnTable : function(player_id, color, tile_id) {
-            // player_id => direction
-            dojo.place(this.format_block('jstpl_tileontable', {
-                x : this.cardwidth * (color - 1),
-                tile_id : tile_id,
-                player_id : player_id
-            }), 'playertabletile_' + player_id);
-
             if (player_id != this.player_id) {
                 // Some opponent played a card
                 // Move card from player panel
-                this.placeOnObject('tileontable_' + player_id + '_' + tile_id, 'overall_player_board_' + player_id);
+                this.tableau[this.player_id].addToStockWithId(color, tile_id);
             } else {
                 // You played a card. If it exists in your hand, move card from there and remove
                 // corresponding item
 
                 if ($('myhand_item_' + tile_id)) {
-                    this.placeOnObject('tileontable_' + player_id + '_' + tile_id, 'myhand_item_' + tile_id);
                     this.playerHand.removeFromStockById(tile_id);
+                    this.tableau[this.player_id].addToStockWithId(color, tile_id);
                 }
             }
-
-            // In any case: move it to its final destination
-            this.slideToObject('tileontable_' + player_id + '_' + tile_id, 'playertabletile_' + player_id).play();
         },
 
         ///////////////////////////////////////////////////
