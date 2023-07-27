@@ -35,6 +35,8 @@ This is your game interface. You can edit this HTML in your ".tpl" file.
         <div class="playertablename" style="color:#{PLAYER_COLOR}">
             {PLAYER_NAME}
         </div>
+        <div class="playertabletile" id="playertabletile_{PLAYER_ID}">
+        </div>
     </div>
     <!-- END player -->
 
@@ -62,7 +64,7 @@ This is your game interface. You can edit this HTML in your ".tpl" file.
 <script type="text/javascript">
 
 // Javascript HTML templates
-var jstpl_cardontable = '<div class="tileontable" id="tileontable_${player_id}" style="background-position:-${x}px">\
+var jstpl_tileontable = '<div class="tileontable" id="tileontable_${player_id}_${tile_id}" style="background-position:-${x}px">\
                         </div>';
 
 

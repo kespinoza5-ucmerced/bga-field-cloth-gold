@@ -72,7 +72,8 @@ function (dojo, declare) {
 
             // Create cards types:
             for ( const color_id in this.gamedatas.tile_types ) {
-                let sprite_position = this.gamedatas.tiles[color_id].sprite_position;
+                console.log('this is the color_id ', color_id)
+                let sprite_position = color_id - 1;
                 this.playerHand.addItemType(color_id, color_id, g_gamethemeurl + 'img/tokens.png', sprite_position);
             }
 
@@ -96,7 +97,7 @@ function (dojo, declare) {
             for ( i in this.gamedatas.cardsontable ) {
                 let tile = this.gamedatas.tilesontable[i];
                 let player_id = card.location_arg;
-                this.playCardOnTable(player_id, tile.id, tile.stock_id);
+                this.playTileOnTable(player_id, tile.id, tile.stock_id);
             }
  
             // Setup game notifications to handle (see "setupNotifications" method below)
@@ -228,19 +229,19 @@ function (dojo, declare) {
             if (player_id != this.player_id) {
                 // Some opponent played a card
                 // Move card from player panel
-                this.placeOnObject('tileontable_' + player_id, 'overall_player_board_' + player_id);
+                this.placeOnObject('tileontable_' + player_id + '_' + tile_id, 'overall_player_board_' + player_id);
             } else {
                 // You played a card. If it exists in your hand, move card from there and remove
                 // corresponding item
 
                 if ($('myhand_item_' + tile_id)) {
-                    this.placeOnObject('tileontable_' + player_id, 'myhand_item_' + tile_id);
+                    this.placeOnObject('tileontable_' + player_id + '_' + tile_id, 'myhand_item_' + tile_id);
                     this.playerHand.removeFromStockById(tile_id);
                 }
             }
 
             // In any case: move it to its final destination
-            this.slideToObject('tileontable_' + player_id, 'playertabletile_' + player_id).play();
+            this.slideToObject('tileontable_' + player_id + '_' + tile_id, 'playertabletile_' + player_id).play();
         },
 
         ///////////////////////////////////////////////////
@@ -264,8 +265,12 @@ function (dojo, declare) {
                 if (this.checkAction('playCard', true)) {
                     // Can play a card
 
-                    var card_id = items[0].id;
-                    console.log("on playCard "+card_id);
+                    var tile_id = items[0].id;
+                    console.log("on playCard "+tile_id);
+                    // type is color
+                    var tile_type = items[0].type;
+                    
+                    this.playTileOnTable(this.player_id, tile_type, tile_id);
 
                     this.playerHand.unselectAll();
                 } else if (this.checkAction('giveCards')) {
