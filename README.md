@@ -8,7 +8,7 @@ Digital adaptation of the 2-player board game [The Field of Cloth of Gold](https
 Falls under [BGA Licensing.](https://github.com/kespinoza5-ucmerced/bga-field-cloth-gold/blob/main/LICENCE_BGA)
 
 # Development
-N/A
+TBA
 
 # Test
-N/A
+TBA
