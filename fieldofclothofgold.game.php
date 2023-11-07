@@ -100,7 +100,7 @@ class fieldofclothofgold extends Table
         // Deal 13 cards to each players
         $players = self::loadPlayersBasicInfos();
         foreach ( $players as $player_id => $player ) {
-            $tiles = $this->sack->pickCards(2, 'deck', $player_id);
+            $tiles = $this->sack->pickCards(13, 'deck', $player_id);
         }         
         
         // Init game statistics

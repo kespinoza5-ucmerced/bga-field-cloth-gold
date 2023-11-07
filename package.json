@@ -1,0 +1,18 @@
+{
+  "name": "field-cloth-gold-testing",
+  "version": "0.0.0",
+  "description": "test suite for client-side code",
+  "main": "fieldofclothofgold.js",
+  "directories": {
+    "test": "test",
+    "modules": "modules/js"
+  },
+  "scripts": {
+    "test": "jest --watchAll --verbose"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
