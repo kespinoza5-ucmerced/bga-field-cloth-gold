@@ -19,7 +19,8 @@ define([
     "dojo","dojo/_base/declare",
     "ebg/core/gamegui",
     "ebg/counter",
-    "ebg/stock"
+    "ebg/stock",
+    g_gamethemeurl+"modules/js/utility.js"
 ],
 function (dojo, declare) {
     return declare("bgagame.fieldofclothofgold", ebg.core.gamegui, {
@@ -63,13 +64,14 @@ function (dojo, declare) {
                 // TODO: Setting up players boards if needed
                 this.tableau[player_id] = new ebg.stock();
                 this.tableau[player_id].create( this, $('playertabletile_'+player_id), this.cardwidth, this.cardheight );
-                this.tableau[player_id].autowidth = true;
+                // this.tableau[player_id].autowidth = true;
 
                 this.tableau[player_id].image_items_per_row = 5;
                 
                 for ( const color_id in this.gamedatas.tile_types ) {
                     let sprite_position = color_id - 1;
                     this.tableau[player_id].addItemType(color_id, color_id, g_gamethemeurl + 'img/tokens.png', sprite_position);
+                    this.tableau[player_id].autowidth = true;
                 }
             }
             
@@ -99,8 +101,8 @@ function (dojo, declare) {
             for ( let i in this.gamedatas.hand ) {
                 let tile = this.gamedatas.hand[i];
                 console.log('tile ', tile)
-                console.log('add to stock with id: ', tile.type, this.getTileUniqueType(tile.type), tile.id)
-                this.playerHand.addToStockWithId(this.getTileUniqueType(tile.type), tile.id);
+                console.log('add to stock with id: ', tile.type, getTileUniqueType(tile.type), tile.id)
+                this.playerHand.addToStockWithId(getTileUniqueType(tile.type), tile.id);
             }
 
             // Cards played on table
@@ -209,25 +211,6 @@ function (dojo, declare) {
         
         */
 
-        // Get card unique identifier based on its color and value
-        getTileUniqueType : function(color) {
-            // bl,r,go,wh,gr
-            if (color == 'blue') {
-                return 1;
-            } else if (color == 'red') {
-                return 2;
-            } else if (color == 'gold') {
-                return 3;
-            } else if (color == 'white') {
-                return 4;
-            } else if (color == 'green') {
-                return 5;
-            }
-
-            // means error
-            return -1;
-        },
-
         playTileOnTable : function(player_id, color, tile_id) {
             if (player_id != this.player_id) {
                 // Some opponent played a card
@@ -242,6 +225,8 @@ function (dojo, declare) {
                     this.tableau[this.player_id].addToStockWithId(color, tile_id);
                 }
             }
+
+            // this.tableau[this.player_id].updateDisplay();
         },
 
         ///////////////////////////////////////////////////
