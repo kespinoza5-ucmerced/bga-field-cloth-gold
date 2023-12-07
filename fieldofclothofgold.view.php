@@ -45,7 +45,8 @@ class view_fieldofclothofgold_fieldofclothofgold extends game_view
 
         $this->page->begin_block( $template, "player" );
         foreach ( $players as $player_id => $info ) {
-            $this->page->insert_block("player", array ("PLAYER_ID" => $player_id,
+            $this->page->insert_block("player", array (
+                    "PLAYER_ID" => $player_id,
                     "PLAYER_NAME" => $players [$player_id] ['player_name'],
                     "PLAYER_COLOR" => $players [$player_id] ['player_color']));
         }
