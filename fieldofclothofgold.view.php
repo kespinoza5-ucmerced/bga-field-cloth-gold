@@ -65,22 +65,6 @@ class view_fieldofclothofgold_fieldofclothofgold extends game_view
             ));
         }
 
-        $this->page->begin_block( $template, "score_track" );
-
-        $hor_scale = 46;
-        $ver_scale = 46;
-        for ( $y=0; $y<5; $y++ )
-        {
-            for ( $x=0; $x<8; $x++ ) {
-                $this->page->insert_block( "score_track", array(
-                    'X' => $x,
-                    'Y' => $y,
-                    'LEFT' => round( ($x)*$hor_scale+332 ),
-                    'TOP' => round( ($y)*$ver_scale+308 )
-                ));
-            }
-        }
-
         /*
         
         // Examples: set the value of some element defined in your tpl file like this: {MY_VARIABLE_ELEMENT}

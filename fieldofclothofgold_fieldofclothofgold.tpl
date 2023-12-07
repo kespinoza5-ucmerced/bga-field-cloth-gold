@@ -63,10 +63,50 @@ This is your game interface. You can edit this HTML in your ".tpl" file.
     <div id="square_{X}" class="square" style="left: {LEFT}px; top: {TOP}px;"></div>
     <!-- END square -->
 
-    <!-- BEGIN score_track -->
-    <div id="score_{X}_{Y}" class="circle" style="left: {LEFT}px; top: {TOP}px;"></div>
-    <!-- END score_track -->
+    <div id="score_track_0" class="circle" style="left: 328px; top: 292px;"></div>
+    <div id="score_track_1" class="circle" style="left: 376px; top: 292px;"></div>
+    <div id="score_track_2" class="circle" style="left: 427px; top: 292px;"></div>
+    <div id="score_track_3" class="circle" style="left: 476px; top: 292px;"></div>
+    <div id="score_track_4" class="circle" style="left: 525px; top: 292px;"></div>
+    <div id="score_track_5" class="circle" style="left: 575px; top: 292px;"></div>
+    <div id="score_track_6" class="circle" style="left: 626px; top: 292px;"></div>
+    <div id="score_track_7" class="circle" style="left: 676px; top: 292px;"></div>
+
+    <div id="score_track_8" class="circle" style="left: 328px; top: 340px;"></div>
+    <div id="score_track_9" class="circle" style="left: 376px; top: 340px;"></div>
+    <div id="score_track_10" class="circle" style="left: 427px; top: 340px;"></div>
+    <div id="score_track_11" class="circle" style="left: 476px; top: 340px;"></div>
+    <div id="score_track_12" class="circle" style="left: 525px; top: 340px;"></div>
+    <div id="score_track_13" class="circle" style="left: 575px; top: 340px;"></div>
+    <div id="score_track_14" class="circle" style="left: 626px; top: 340px;"></div>
+    <div id="score_track_15" class="circle" style="left: 676px; top: 340px;"></div>
+
+    <div id="score_track_16" class="circle" style="left: 328px; top: 388px;"></div>
+    <div id="score_track_17" class="circle" style="left: 377px; top: 388px;"></div>
+    <div id="score_track_18" class="circle" style="left: 427px; top: 388px;"></div>
+    <div id="score_track_19" class="circle" style="left: 476px; top: 388px;"></div>
+    <div id="score_track_20" class="circle" style="left: 525px; top: 388px;"></div>
+    <div id="score_track_21" class="circle" style="left: 575px; top: 388px;"></div>
+    <div id="score_track_22" class="circle" style="left: 626px; top: 388px;"></div>
+    <div id="score_track_23" class="circle" style="left: 676px; top: 388px;"></div>
+
+    <div id="score_track_24" class="circle" style="left: 327px; top: 436px;"></div>
+    <div id="score_track_25" class="circle" style="left: 376px; top: 436px;"></div>
+    <div id="score_track_26" class="circle" style="left: 426px; top: 436px;"></div>
+    <div id="score_track_27" class="circle" style="left: 476px; top: 436px;"></div>
+    <div id="score_track_28" class="circle" style="left: 525px; top: 436px;"></div>
+    <div id="score_track_29" class="circle" style="left: 575px; top: 436px;"></div>
+    <div id="score_track_30" class="circle" style="left: 624px; top: 436px;"></div>
+    <div id="score_track_31" class="circle" style="left: 674px; top: 436px;"></div>
     
+    <div id="score_track_32" class="circle" style="left: 324px; top: 484px;"></div>
+    <div id="score_track_33" class="circle" style="left: 375px; top: 484px;"></div>
+    <div id="score_track_34" class="circle" style="left: 424px; top: 484px;"></div>
+    <div id="score_track_35" class="circle" style="left: 474px; top: 484px;"></div>
+    <div id="score_track_36" class="circle" style="left: 524px; top: 484px;"></div>
+    <div id="score_track_37" class="circle" style="left: 573px; top: 484px;"></div>
+    <div id="score_track_38" class="circle" style="left: 623px; top: 484px;"></div>
+    <div id="score_track_39" class="circle" style="left: 672px; top: 484px;"></div>
 </div>
 
 <script type="text/javascript">
