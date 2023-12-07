@@ -93,7 +93,7 @@ function (dojo, declare) {
             // hook up player hand ??
             dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
 
-            console.log('here is gamedatas ', this.gamedatas)
+            console.log('here is gamedatas ', this.gamedatas);
             console.log('here is hand ',this.gamedatas.hand);
             console.log('here is cardsontable ',this.gamedatas.cardsontable);
 
@@ -114,6 +114,16 @@ function (dojo, declare) {
  
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
+
+            // window.addEventListener('resize', function(event) {
+            //     this.playerHand.updateDisplay();
+
+            //     // for (tableau in this.tableau[this.player_id]) {
+            //     //     tableau.updateDisplay();
+            //     // }
+
+            // }, true);
+            
 
             console.log( "Ending game setup" );
         },
@@ -225,8 +235,6 @@ function (dojo, declare) {
                     this.tableau[this.player_id].addToStockWithId(color, tile_id);
                 }
             }
-
-            // this.tableau[this.player_id].updateDisplay();
         },
 
         ///////////////////////////////////////////////////
@@ -264,6 +272,8 @@ function (dojo, declare) {
                     this.playerHand.unselectAll();
                 }
             }
+
+            this.playerHand.updateDisplay();
         },
     
         
