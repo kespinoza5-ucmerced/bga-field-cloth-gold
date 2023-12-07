@@ -99,8 +99,8 @@
     display: inline-block;
     position: relative;
     margin-top: 5px;
-    width: 36px;
-    height: 36px;
+    width: 150px;
+    height: 150px;
     /* we remove background-image here */
 }
 
@@ -108,9 +108,10 @@
 
 .tileontable {
     position: absolute;
-    width: 36px;
-    height: 36px;
-    background-image: url('img/tokens.png'); 
+    width: 150px;
+    height: 150px;
+    background-image: url('img/tiles.png');
+    background-size: 275px;
 }
 
 /*

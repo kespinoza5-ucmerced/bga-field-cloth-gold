@@ -70,7 +70,7 @@ function (dojo, declare) {
                 
                 for ( const color_id in this.gamedatas.tile_types ) {
                     let sprite_position = color_id - 1;
-                    this.tableau[player_id].addItemType(color_id, color_id, g_gamethemeurl + 'img/tokens.png', sprite_position);
+                    this.tableau[player_id].addItemType(color_id, color_id, g_gamethemeurl + 'img/tiles.png', sprite_position);
                     this.tableau[player_id].autowidth = true;
                 }
             }
@@ -87,7 +87,7 @@ function (dojo, declare) {
             for ( const color_id in this.gamedatas.tile_types ) {
                 console.log('this is the color_id ', color_id)
                 let sprite_position = color_id - 1;
-                this.playerHand.addItemType(color_id, color_id, g_gamethemeurl + 'img/tokens.png', sprite_position);
+                this.playerHand.addItemType(color_id, color_id, g_gamethemeurl + 'img/tiles.png', sprite_position);
             }
 
             // hook up player hand ??
