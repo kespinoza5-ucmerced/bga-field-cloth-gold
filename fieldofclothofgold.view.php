@@ -53,28 +53,32 @@ class view_fieldofclothofgold_fieldofclothofgold extends game_view
         // this will make our My Hand text translatable
         $this->tpl['MY_HAND'] = self::_("My hand");
 
-        $this->page->begin_block( $template, "oval" );
+        $this->page->begin_block( $template, "square" );
 
-        $hor_scale = 87;
-        for ( $x=0; $x<7; $x++ )
-        {
-            $this->page->insert_block( "oval", array(
-                'X' => $x,
-                'LEFT' => round( ($x)*$hor_scale+69 ),
-                'TOP' => 118
-            ));
-        }
-
-        $this->page->begin_block( "fieldofclothofgold_fieldofclothofgold", "square" );
-
-        $hor_scale = 87;
-        for ( $x=1; $x<=6; $x++ )
+        $hor_scale = 94;
+        for ( $x=0; $x<6; $x++ )
         {
             $this->page->insert_block( "square", array(
                 'X' => $x,
-                'LEFT' => round( ($x)*$hor_scale+69 ),
-                'TOP' => 159
+                'LEFT' => round( ($x)*$hor_scale+141 ),
+                'TOP' => 197
             ));
+        }
+
+        $this->page->begin_block( $template, "score_track" );
+
+        $hor_scale = 46;
+        $ver_scale = 46;
+        for ( $y=0; $y<5; $y++ )
+        {
+            for ( $x=0; $x<8; $x++ ) {
+                $this->page->insert_block( "score_track", array(
+                    'X' => $x,
+                    'Y' => $y,
+                    'LEFT' => round( ($x)*$hor_scale+332 ),
+                    'TOP' => round( ($y)*$ver_scale+308 )
+                ));
+            }
         }
 
         /*
