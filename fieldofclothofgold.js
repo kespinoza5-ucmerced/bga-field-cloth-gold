@@ -111,6 +111,8 @@ function (dojo, declare) {
                 let player_id = card.location_arg;
                 this.playTileOnTable(player_id, tile.id, tile.stock_id);
             }
+
+            this.addTokenOnBoard( 2, this.player_id );
  
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -236,6 +238,18 @@ function (dojo, declare) {
                 }
             }
         },
+
+        addTokenOnBoard: function( x, player )
+        {
+            dojo.place( this.format_block( 'jstpl_token', {
+                x: x,
+                color: this.gamedatas.players[ player ].color
+            } ) , 'tokens' );
+            
+            this.placeOnObject( 'token_'+x, 'overall_player_board_'+player );
+            this.slideToObject( 'token_'+x, 'circle_action_'+x ).play();
+        },
+
 
         ///////////////////////////////////////////////////
         //// Player's action
