@@ -189,6 +189,12 @@ class fieldofclothofgold extends Table
         (note: each method below must match an input method in fieldofclothofgold.action.php)
     */
 
+    function playTile($tile_id) {
+        self::checkAction("dragonSelected");
+        $player_id = self::getActivePlayerId();
+        throw new BgaUserException(self::_("Not implemented: ") . "$player_id plays $tile_id");
+    }
+
     /*
     
     Example:

@@ -255,15 +255,23 @@ function (dojo, declare) {
             var items = this.playerHand.getSelectedItems();
 
             if (items.length > 0) {
-                if (this.checkAction('playCard', true)) {
+                var action = 'dragonSelected';
+                if (this.checkAction(action, true)) {
                     // Can play a card
 
                     var tile_id = items[0].id;
-                    console.log("on playCard "+tile_id);
+                    console.log("on "+action+" " +tile_id);
+
                     // type is color
                     var tile_type = items[0].type;
+                    this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                        id : tile_id,
+                        lock : true
+                    }, this, function(result) {
+                    }, function(is_error) {
+                    });
                     
-                    this.playTileOnTable(this.player_id, tile_type, tile_id);
+                    // this.playTileOnTable(this.player_id, tile_type, tile_id);
 
                     this.playerHand.unselectAll();
                 } else if (this.checkAction('giveCards')) {

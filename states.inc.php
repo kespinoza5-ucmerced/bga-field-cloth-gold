@@ -64,12 +64,20 @@ $machinestates = array(
     // Note: ID=2 => your first state
 
     2 => array(
-    		"name" => "playerTurn",
-    		"description" => clienttranslate('${actplayer} must play a card or pass'),
-    		"descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
-    		"type" => "activeplayer",
-    		"possibleactions" => array( "playCard", "pass" ),
-    		"transitions" => array( "playCard" => 2, "pass" => 2 )
+        "name" => "playerTurn",
+        "description" => clienttranslate('${actplayer} must select and move a token'),
+        "descriptionmyturn" => clienttranslate('${you} must select and move a token'),
+        "type" => "activeplayer",
+        "possibleactions" => array( "dragonSelected", "secrecySelected", "goldSelected", "blueSelected", "whiteSelected", "redSelected", "purpleSelected" ),
+        "transitions" => array( "dragonSelected" => 21, "secrecySelected" => 22, "goldSelected" => 23, "blueSelected" => 24, "whiteSelected" => 25, "redSelected" => 26, "purpleSelected" => 27 ),
+    ),
+
+    3 => array(
+        "name" => "nextPlayer",
+        "type" => "game",
+        "action" => "stNextPlayer",
+        "updateGameProgression" => true,        
+        "transitions" => array( "nextTurn" => 2, "endGame" => 99 )
     ),
     
 /*
