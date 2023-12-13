@@ -113,6 +113,8 @@ function (dojo, declare) {
             }
 
             this.addTokenOnBoard( 2, this.player_id );
+
+            dojo.query( '.circle_action' ).connect( 'onclick', this, 'onMoveToken' );
  
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -264,6 +266,15 @@ function (dojo, declare) {
             _ make a call to the game server
         
         */
+
+        onMoveToken: function( evt ) {
+            dojo.stopEvent( evt );
+
+            var coords = evt.currentTarget.id.split('_');
+            var x = coords[2];
+
+            console.log("on moveToken "+x);
+        },
 
         onPlayerHandSelectionChanged: function() {
             var items = this.playerHand.getSelectedItems();
