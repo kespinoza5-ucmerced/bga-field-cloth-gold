@@ -136,7 +136,7 @@ class fieldofclothofgold extends Table
     
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
-        $sql = "SELECT player_id id, player_score score FROM player ";
+        $sql = "SELECT player_id id, player_score score, player_tokens_in_stock token_stock FROM player ";
         $result['players'] = self::getCollectionFromDb( $sql );
         $result['tiles'] = $this->tiles;
         $result['tile_types'] = $this->colors;
