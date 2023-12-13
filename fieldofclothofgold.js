@@ -112,7 +112,11 @@ function (dojo, declare) {
                 this.playTileOnTable(player_id, tile.id, tile.stock_id);
             }
 
+            dojo.query( 'tokens' ).connect( 'onclick', this, 'onMoveToken' );
+
             this.addTokenOnBoard( 2, this.player_id );
+
+            dojo.query( '.circle_action' ).connect( 'onclick', this, 'onMoveToken' );
  
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -264,6 +268,40 @@ function (dojo, declare) {
             _ make a call to the game server
         
         */
+
+        onMoveToken: function( evt ) {
+            dojo.stopEvent( evt );
+
+            // Get the clicked circle x
+            // Note: square id format is "circle_action_X"
+            var coords = evt.currentTarget.id.split('_');
+            var x = coords[2];
+
+            if( x < 1 || x > 7) {
+                // This is not a possible move => the click does nothing
+                return;
+            }
+
+            // if( ! dojo.hasClass( 'circle_action_'+x, 'possibleMove' ) )
+            // {
+            //     // This is not a possible move => the click does nothing
+            //     return ;
+            // }
+
+            console.log("on moveToken to "+x);
+
+            this.playerHand.unselectAll();
+
+            
+            // if( this.checkAction( 'playDisc' ) )    // Check that this action is possible at this moment
+            // {            
+            //     this.ajaxcall( "/reversi/reversi/playDisc.html", {
+            //         x:x,
+            //         y:y
+            //     }, this, function( result ) {} );
+            // }            
+
+        },
 
         onPlayerHandSelectionChanged: function() {
             var items = this.playerHand.getSelectedItems();

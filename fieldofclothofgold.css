@@ -56,13 +56,34 @@
     position: relative;
 }
 
-.circle {
+.circle_score {
     width: 36px;
     height: 36px;
     border-radius: 50%;
     position: absolute;
     border-style: solid;
     border-color: #ff0000;
+}
+
+.circle_action {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.circle_dragon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    position: absolute;
+    border-style: solid;
+    border-color: #ff0000;
+}
+
+.possible_move {
+    border-style: solid;
+    border-color: #ffffff;
 }
 
 .square {
