@@ -49,7 +49,7 @@ This is your game interface. You can edit this HTML in your ".tpl" file.
 </div>
 
 <div id="board">
-    <div id="circle_home_dragon" class="circle" style="left: 70px; top: 92px;"></div>
+    <div id="circle_action_0" class="circle" style="left: 70px; top: 92px;"></div>
 
     <div id="tokens">
         <div id="circle_action_1" class="circle" style="left: 70px; top: 145px;"></div>
