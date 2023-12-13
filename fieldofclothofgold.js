@@ -273,7 +273,7 @@ function (dojo, declare) {
             dojo.stopEvent( evt );
 
             // Get the clicked circle x
-            // Note: square id format is "circle_action_X"
+            // Note: circle id format is "circle_action_X"
             var coords = evt.currentTarget.id.split('_');
             var x = coords[2];
 
