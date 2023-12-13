@@ -30,13 +30,14 @@ CREATE TABLE IF NOT EXISTS `card` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `board` (
-  `board_x` smallint(5) unsigned NOT NULL,
-  `board_token` int(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`board_x`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `board_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `board_player` int(10) unsigned DEFAULT NULL,
+  `board_dragon` BOOLEAN DEFAULT 0,
+  PRIMARY KEY (`board_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;
+
 
 ALTER TABLE `player` ADD `player_first` BOOLEAN NOT NULL DEFAULT '0';
-ALTER TABLE `player` ADD `player_tokens_in_stock` smallint(5) NOT NULL DEFAULT 2;
 
 -- Example 2: add a custom field to the standard "player" table
 -- ALTER TABLE `player` ADD `player_my_custom_field` INT UNSIGNED NOT NULL DEFAULT '0';

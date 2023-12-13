@@ -73,6 +73,19 @@ class fieldofclothofgold extends Table
         }
         $sql .= implode( ',', $values );
         self::DbQuery( $sql );
+
+        $sql = "INSERT INTO board () VALUES();";
+        for( $x=0 ; $x<7 ; $x++ )
+        {
+            self::DbQuery( $sql );
+        }
+
+        // `board_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+        // `board_player` int(10) unsigned DEFAULT NULL,
+        // `board_dragon` BOOLEAN DEFAULT 0,      
+        $sql = "INSERT INTO board (board_id, board_player, board_dragon) VALUES(0, NULL, 1);";
+        self::DbQuery( $sql );
+
         self::reattributeColorsBasedOnPreferences( $players, $gameinfos['player_colors'] );
         self::reloadPlayersBasicInfos();
         
@@ -136,8 +149,15 @@ class fieldofclothofgold extends Table
     
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
-        $sql = "SELECT player_id id, player_score score, player_tokens_in_stock token_stock FROM player ";
+        $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb( $sql );
+
+        // `board_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+        // `board_player` int(10) unsigned DEFAULT NULL,
+        // `board_dragon` BOOLEAN DEFAULT 0,      
+        $sql = "SELECT board_id id, board_player player, board_dragon dragon FROM board";
+        $result['board'] = self::getCollectionFromDb( $sql );
+
         $result['tiles'] = $this->tiles;
         $result['tile_types'] = $this->colors;
         $result['sack'] = $this->sack;
