@@ -74,15 +74,24 @@ class fieldofclothofgold extends Table
         $sql .= implode( ',', $values );
         self::DbQuery( $sql );
 
+        // Create tokens
+        $sql = "INSERT INTO token (token_id, token_player) VALUES ";
+        $values = array();
+        foreach( $players as $player_id => $player )
+        {
+            for ( $token_id=1 ; $token_id<=2 ; $token_id++ ) {
+                $values[] = "('".$token_id."','".$player_id."')";
+            }
+        }
+        $sql .= implode( ',', $values );
+        self::DbQuery( $sql );        
+
         $sql = "INSERT INTO board () VALUES();";
         for( $x=0 ; $x<7 ; $x++ )
         {
             self::DbQuery( $sql );
         }
 
-        // `board_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
-        // `board_player` int(10) unsigned DEFAULT NULL,
-        // `board_dragon` BOOLEAN DEFAULT 0,      
         $sql = "INSERT INTO board (board_id, board_player, board_dragon) VALUES(0, NULL, 1);";
         self::DbQuery( $sql );
 
@@ -156,6 +165,8 @@ class fieldofclothofgold extends Table
         $result['tile_types'] = $this->colors;
         $result['sack'] = $this->sack;
         $result['possibleMoves'] = self::getPossibleMoves();
+        $sql = "SELECT token_player player, token_id id, token_location loc FROM token WHERE token_location='SUPPLY'";
+        $result['play_tok'] = self::getDoubleKeyCollectionFromDB( $sql );
   
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
         // Cards in player hand
@@ -303,6 +314,32 @@ class fieldofclothofgold extends Table
     */
 
     function stSelectTokenFromSupply() {
+        // query db for player tokens in supply
+        $sql = "SELECT token_player player, token_id id, token_location loc FROM token
+                WHERE token_location='SUPPLY'";
+
+        $players = self::getDoubleKeyCollectionFromDB( $sql );
+        // $token = array_shift($tokens);
+
+        // `selected_token_id` smallint(5) unsigned NOT NULL,
+        // `selected_token_player_id` int(10) unsigned NOT NULL,
+        // `selected_token_location` int(10) unsigned NOT NULL,      
+        $sql = "INSERT INTO selected_token (selected_token_id, selected_token_player_id, selected_token_location) VALUES ";
+        $values = array();
+
+        foreach ( $players as $player ) {
+            $token = array_shift($player);
+            if ( $token == NULL ) {
+                continue;
+            }
+
+            $values[] = "('".$token['id']."','".$token['player']."','".$token['loc']."')";
+        }
+
+        $sql .= implode( ',', $values );
+        self::DbQuery( $sql );
+
+
         $this->gamestate->nextState("");
     }
     

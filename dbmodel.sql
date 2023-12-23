@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `token` (
 CREATE TABLE IF NOT EXISTS `selected_token` (
   `selected_token_id` smallint(5) unsigned NOT NULL,
   `selected_token_player_id` int(10) unsigned NOT NULL,
-  `selected_token_location` int(10) unsigned NOT NULL,
+  `selected_token_location` varchar(10) NOT NULL NOT NULL,
   PRIMARY KEY (`selected_token_id`,`selected_token_player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
