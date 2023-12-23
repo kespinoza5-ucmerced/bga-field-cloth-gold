@@ -60,26 +60,45 @@ $machinestates = array(
         "action" => "stGameSetup",
         "transitions" => array( "" => 2 )
     ),
-    
-    // Note: ID=2 => your first state
 
+    /// New hand
     2 => array(
-        "name" => "playerTurn",
-        "description" => clienttranslate('${actplayer} must select and move a token'),
-        "descriptionmyturn" => clienttranslate('${you} must select and move a token'),
+        "name" => "selectTokenFromSupply",
+        "description" => "",
+        "type" => "game",
+        "action" => "stSelectTokenFromSupply",
+        // "updateGameProgression" => true,
+        "transitions" => array( "" => 10 )
+    ),
+    
+    10 => array(
+        "name" => "placeToken",
+        "description" => clienttranslate('${actplayer} must place a token'),
+        "descriptionmyturn" => clienttranslate('${you} must place a token'),
         "type" => "activeplayer",
-        "possibleactions" => array( "dragonSelected", "secrecySelected", "goldSelected", "blueSelected", "whiteSelected", "redSelected", "purpleSelected" ),
-        "transitions" => array( "dragonSelected" => 21, "secrecySelected" => 22, "goldSelected" => 23, "blueSelected" => 24, "whiteSelected" => 25, "redSelected" => 26, "purpleSelected" => 27 ),
+        "args" => "argPlaceToken",
+        "possibleactions" => array( "placeToken" ),
+        "transitions" => array( "placeToken" => 40 ),
     ),
 
-    3 => array(
+    11 => array(
+        "name" => "selectToken",
+        "description" => clienttranslate('${actplayer} must select a token'),
+        "descriptionmyturn" => clienttranslate('${you} must select a token'),
+        "type" => "activeplayer",
+        "possibleactions" => array( "selectToken" ),
+        "transitions" => array( "selectToken" => 10 ),
+    ),  
+
+    40 => array(
         "name" => "nextPlayer",
         "type" => "game",
         "action" => "stNextPlayer",
         "updateGameProgression" => true,        
-        "transitions" => array( "nextTurn" => 2, "endGame" => 99 )
+        "transitions" => array( "placeFromSupply" => 2, "placeFromBoard" => 11, "endGame" => 99 )
     ),
     
+
 /*
     Examples:
     
