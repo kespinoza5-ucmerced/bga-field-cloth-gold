@@ -151,16 +151,11 @@ class fieldofclothofgold extends Table
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
         $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb( $sql );
-
-        // `board_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
-        // `board_player` int(10) unsigned DEFAULT NULL,
-        // `board_dragon` BOOLEAN DEFAULT 0,      
-        $sql = "SELECT board_id id, board_player player, board_dragon dragon FROM board";
-        $result['board'] = self::getCollectionFromDb( $sql );
-
+        $result['board'] = self::getBoard();
         $result['tiles'] = $this->tiles;
         $result['tile_types'] = $this->colors;
         $result['sack'] = $this->sack;
+        $result['possibleMoves'] = self::getPossibleMoves();
   
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
         // Cards in player hand
@@ -198,7 +193,28 @@ class fieldofclothofgold extends Table
         In this space, you can put any utility methods useful for your game logic
     */
 
+    function tokenPlacementIsValid( $oval_id ) {
 
+    }
+
+    function getBoard() {
+        $sql = "SELECT board_id id, board_player player, board_dragon dragon FROM board";
+        return self::getCollectionFromDb( $sql );
+    }
+
+    function getPossibleMoves() {
+        $result = array();
+
+        $board = self::getBoard();
+
+        for ( $x=1; $x<=7; $x++ ) {
+            if( $board[$x]['player'] == NULL ) {
+                $result[$x] = $x;
+            }
+        }
+
+        return $result;
+    }
 
 //////////////////////////////////////////////////////////////////////////////
 //////////// Player actions
@@ -209,10 +225,11 @@ class fieldofclothofgold extends Table
         (note: each method below must match an input method in fieldofclothofgold.action.php)
     */
 
-    function playTile($tile_id) {
-        self::checkAction("dragonSelected");
+    function placeToken($oval_id) {
+        self::checkAction("placeToken");
         $player_id = self::getActivePlayerId();
-        throw new BgaUserException(self::_("Not implemented: ") . "$player_id plays $tile_id");
+        
+        throw new BgaUserException(self::_("Not implemented: ") . "$player_id places at $oval_id");
     }
 
     /*
@@ -252,6 +269,13 @@ class fieldofclothofgold extends Table
         game state.
     */
 
+    function argPlaceToken() {
+        return array (
+            'possibleMoves' => self::getPossibleMoves( self::getActivePlayerId() )
+        );
+    }
+
+
     /*
     
     Example for game state "MyGameState":
@@ -277,6 +301,26 @@ class fieldofclothofgold extends Table
         Here, you can create methods defined as "game state actions" (see "action" property in states.inc.php).
         The action method of state X is called everytime the current game state is set to X.
     */
+    
+    function stNextPlayer() {
+        // TO DO: If player has reached 30 points
+        if (false) {
+            $this->gamestate->nextState('endGame');
+            return;
+        }
+
+        // TO DO: If bag is out of tiles
+        if (false) {
+            $this->gamestate->nextState('endGame');
+            return;
+        }
+
+        // Standard case (next turn)
+        $player_id = self::activeNextPlayer();
+        self::giveExtraTime($player_id);
+        $this->gamestate->nextState('nextPlayer');
+    }
+
     
     /*
     

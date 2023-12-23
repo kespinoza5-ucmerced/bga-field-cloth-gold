@@ -112,11 +112,11 @@ function (dojo, declare) {
                 this.playTileOnTable(player_id, tile.id, tile.stock_id);
             }
 
-            dojo.query( 'tokens' ).connect( 'onclick', this, 'onMoveToken' );
+            // dojo.query( 'tokens' ).connect( 'onclick', this, 'onMoveToken' );
 
             this.addTokenOnBoard( 2, this.player_id );
 
-            dojo.query( '.circle_action' ).connect( 'onclick', this, 'onMoveToken' );
+            dojo.query( '.circle_action' ).connect( 'onclick', this, 'onPlaceToken' );
  
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -146,20 +146,9 @@ function (dojo, declare) {
             console.log( 'Entering state: '+stateName );
             
             switch( stateName )
-            {
-            
-            /* Example:
-            
-            case 'myGameState':
-            
-                // Show some HTML block at this game state
-                dojo.style( 'my_html_block_id', 'display', 'block' );
-                
-                break;
-           */
-           
-           
-            case 'dummmy':
+            {        
+            case 'placeToken':
+                this.updatePossibleMoves( args.args.possibleMoves );
                 break;
             }
         },
@@ -172,19 +161,7 @@ function (dojo, declare) {
             console.log( 'Leaving state: '+stateName );
             
             switch( stateName )
-            {
-            
-            /* Example:
-            
-            case 'myGameState':
-            
-                // Hide the HTML block we are displaying only during this game state
-                dojo.style( 'my_html_block_id', 'display', 'none' );
-                
-                break;
-           */
-           
-           
+            {       
             case 'dummmy':
                 break;
             }               
@@ -226,6 +203,22 @@ function (dojo, declare) {
             script.
         
         */
+
+        updatePossibleMoves: function( possibleMoves )
+        {
+            console.log('made it to updatePossible')
+            // Remove current possible moves
+            dojo.query( '.possible_move' ).removeClass( 'possible_move' );
+
+            for( var x in possibleMoves )
+            {
+                // x is a possible move
+                dojo.addClass( 'circle_action_'+x, 'possible_move' );
+            }
+                        
+            this.addTooltipToClass( 'possibleMove', '', _('Place a token here') );
+        },
+    
 
         playTileOnTable : function(player_id, color, tile_id) {
             if (player_id != this.player_id) {
@@ -269,7 +262,7 @@ function (dojo, declare) {
         
         */
 
-        onMoveToken: function( evt ) {
+        onPlaceToken: function( evt ) {
             dojo.stopEvent( evt );
 
             // Get the clicked circle x
@@ -288,19 +281,17 @@ function (dojo, declare) {
             //     return ;
             // }
 
-            console.log("on moveToken to "+x);
+            var action = 'placeToken';
+            console.log("on "+action+" to "+x);
 
-            this.playerHand.unselectAll();
-
-            
-            // if( this.checkAction( 'playDisc' ) )    // Check that this action is possible at this moment
-            // {            
-            //     this.ajaxcall( "/reversi/reversi/playDisc.html", {
-            //         x:x,
-            //         y:y
-            //     }, this, function( result ) {} );
-            // }            
-
+            if (this.checkAction(action, true)) {
+                // Can move a token
+                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                    x:x
+                }, this, function(result) {
+                }, function(is_error) {
+                });
+            }
         },
 
         onPlayerHandSelectionChanged: function() {
