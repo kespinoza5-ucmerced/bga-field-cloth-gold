@@ -32,15 +32,14 @@ CREATE TABLE IF NOT EXISTS `card` (
 CREATE TABLE IF NOT EXISTS `board` (
   `board_action` varchar(10) NOT NULL,
   `board_token` smallint(5) unsigned DEFAULT NULL,
-  `board_player` int(10) unsigned DEFAULT NULL,
-  `board_dragon` BOOLEAN DEFAULT 0,
+  `board_player` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`board_action`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
 CREATE TABLE IF NOT EXISTS `token` (
   `token_id` smallint(5) unsigned NOT NULL,
   `token_player` int(10) unsigned NOT NULL,
-  `token_location` varchar(10) NOT NULL DEFAULT 'SUPPLY',
+  `token_location` varchar(10) NOT NULL DEFAULT 'supply',
   PRIMARY KEY (`token_id`,`token_player`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
