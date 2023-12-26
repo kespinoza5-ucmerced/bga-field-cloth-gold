@@ -50,7 +50,7 @@
 
     public function placeToken() {
         self::setAjaxMode();
-        $oval_id = self::getArg("x", AT_posint, true);
+        $oval_id = self::getArg("x", AT_alphanum, true);
         $this->game->placeToken($oval_id);
         self::ajaxResponse();
     }

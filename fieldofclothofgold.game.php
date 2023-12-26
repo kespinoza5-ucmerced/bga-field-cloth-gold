@@ -16,12 +16,21 @@
   *
   */
 
-
 require_once( APP_GAMEMODULE_PATH.'module/table/table.game.php' );
 
 
 class fieldofclothofgold extends Table
 {
+    const ACTIONS = [
+        1 => "dragon",
+        2 => "secrecy",
+        3 => "gold",
+        4 => "blue",
+        5 => "white",
+        6 => "red",
+        7 => "purple"
+    ];
+
 	function __construct( )
 	{
         // Your global variables labels:
@@ -86,13 +95,16 @@ class fieldofclothofgold extends Table
         $sql .= implode( ',', $values );
         self::DbQuery( $sql );        
 
-        $sql = "INSERT INTO board () VALUES();";
-        for( $x=0 ; $x<7 ; $x++ )
+        $sql = "INSERT INTO board (board_action) VALUES ";
+        $values = array();
+        foreach( self::ACTIONS as $action )
         {
-            self::DbQuery( $sql );
+            $values[] = "('".$action."')";
         }
+        $sql .= implode( ',', $values );
+        self::DbQuery( $sql );
 
-        $sql = "INSERT INTO board (board_id, board_player, board_dragon) VALUES(0, NULL, 1);";
+        $sql = "UPDATE board SET board_dragon=1 WHERE board_action='dragon'";
         self::DbQuery( $sql );
 
         self::reattributeColorsBasedOnPreferences( $players, $gameinfos['player_colors'] );
@@ -167,7 +179,11 @@ class fieldofclothofgold extends Table
         $result['possibleMoves'] = self::getPossibleMoves();
         $sql = "SELECT token_player player, token_id id, token_location loc FROM token WHERE token_location='SUPPLY'";
         $result['play_tok'] = self::getDoubleKeyCollectionFromDB( $sql );
-  
+        $sql = "SELECT selected_token_id id, selected_token_player_id player, selected_token_location loc FROM selected_token
+                WHERE selected_token_player_id=".$current_player_id;
+        $result['select_token'] = self::getCollectionFromDb( $sql );
+
+
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
         // Cards in player hand
         $result['hand'] = $this->sack->getCardsInLocation( 'hand', $current_player_id );
@@ -204,12 +220,16 @@ class fieldofclothofgold extends Table
         In this space, you can put any utility methods useful for your game logic
     */
 
-    function tokenPlacementIsValid( $oval_id ) {
+    function tokenPlacementIsValid( $action, $board ) {
+        if ($board) {
 
+        }
+
+        return true;
     }
 
     function getBoard() {
-        $sql = "SELECT board_id id, board_player player, board_dragon dragon FROM board";
+        $sql = "SELECT board_action id, board_token token, board_player player, board_dragon dragon FROM board";
         return self::getCollectionFromDb( $sql );
     }
 
@@ -218,9 +238,9 @@ class fieldofclothofgold extends Table
 
         $board = self::getBoard();
 
-        for ( $x=1; $x<=7; $x++ ) {
-            if( $board[$x]['player'] == NULL ) {
-                $result[$x] = $x;
+        foreach ( $board as $action ) {
+            if ( $action['player'] == NULL ) {
+                $result[$action["id"]] = $action["id"];
             }
         }
 
@@ -236,11 +256,33 @@ class fieldofclothofgold extends Table
         (note: each method below must match an input method in fieldofclothofgold.action.php)
     */
 
-    function placeToken($oval_id) {
+    function placeToken($action) {
         self::checkAction("placeToken");
         $player_id = self::getActivePlayerId();
-        
-        throw new BgaUserException(self::_("Not implemented: ") . "$player_id places at $oval_id");
+
+        $board = self::getBoard();
+
+        if ( ! self::tokenPlacementIsValid( $action, $board ) ) {
+            throw new BgaUserException(self::_("Move not valid: ") . "$player_id places at $action");
+        }
+
+        $sql = "SELECT selected_token_id id, selected_token_player_id player, selected_token_location loc FROM selected_token
+                WHERE selected_token_player_id=".$player_id;
+        $selected_token = self::getCollectionFromDb( $sql );
+
+        // remove old token
+        $sql = "UPDATE board SET board_player=NULL, board_token=NULL WHERE board_player=".$player_id;
+        self::DbQuery( $sql );
+
+        // move selected token
+        $sql = "UPDATE board SET board_player=".$player_id.", board_token=".$selected_token[1]['id']." WHERE board_action='".$action."'";
+        self::DbQuery( $sql );
+
+        // unselect token
+        $sql = "DELETE FROM selected_token WHERE selected_token_player_id=".$player_id;
+        self::DbQuery( $sql );
+
+        // throw new BgaUserException(self::_("Not implemented: ") . "$player_id places at $action");
     }
 
     /*

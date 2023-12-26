@@ -30,11 +30,12 @@ CREATE TABLE IF NOT EXISTS `card` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `board` (
-  `board_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `board_action` varchar(10) NOT NULL,
+  `board_token` smallint(5) unsigned DEFAULT NULL,
   `board_player` int(10) unsigned DEFAULT NULL,
   `board_dragon` BOOLEAN DEFAULT 0,
-  PRIMARY KEY (`board_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=0 ;
+  PRIMARY KEY (`board_action`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
 CREATE TABLE IF NOT EXISTS `token` (
   `token_id` smallint(5) unsigned NOT NULL,
