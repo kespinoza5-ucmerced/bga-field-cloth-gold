@@ -93,7 +93,7 @@ class fieldofclothofgold extends Table
             }
         }
         $sql .= implode( ',', $values );
-        self::DbQuery( $sql );        
+        self::DbQuery( $sql );
 
         $sql = "INSERT INTO board (board_action) VALUES ";
         $values = array();
@@ -174,12 +174,10 @@ class fieldofclothofgold extends Table
         $result['tile_types'] = $this->colors;
         $result['sack'] = $this->sack;
         $result['possibleMoves'] = self::getPossibleMoves();
-        $sql = "SELECT token_player player, token_id id, token_location loc FROM token WHERE token_location='supply'";
-        $result['play_tok'] = self::getDoubleKeyCollectionFromDB( $sql );
-        $sql = "SELECT selected_token_id id, selected_token_player_id player, selected_token_location loc FROM selected_token
-                WHERE selected_token_player_id=".$current_player_id;
-        $result['select_token'] = self::getCollectionFromDb( $sql );
-
+        $sql = "SELECT token_player player, MIN(token_id) id, token_location loc FROM token
+                WHERE token_location='supply' AND 
+                    token_player='".$current_player_id."'";
+        $result['selected_token'] = self::getCollectionFromDb( $sql );
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
         // Cards in player hand
@@ -273,26 +271,29 @@ class fieldofclothofgold extends Table
             throw new BgaUserException(self::_("Move not valid: ") . "$player_id places at $action");
         }
 
-        $sql = "SELECT selected_token_id id, selected_token_player_id player, selected_token_location loc FROM selected_token
-                WHERE selected_token_player_id='".$player_id."'";
-        $selected_token = self::getCollectionFromDb( $sql );
+        $sql = "SELECT token_player player, token_id id, token_location loc FROM token
+                WHERE token_player='".$player_id."' AND
+                    token_selected=1";
+        $selected_token = self::getCollectionFromDb( $sql )[$player_id]['id'];
 
         // remove old token
-        $sql = "UPDATE board SET board_player=NULL, board_token=NULL WHERE board_player='".$player_id."'";
+        $sql = "UPDATE board SET board_player=NULL, board_token=NULL 
+                WHERE board_player='".$player_id."' AND
+                    board_token=".$selected_token;
         self::DbQuery( $sql );
 
         $sql = "UPDATE token SET token_location='".$action."'
-                WHERE token_id=".$selected_token[1]['id']." AND
+                WHERE token_id=".$selected_token." AND
                     token_player='".$player_id."'";
         self::DbQuery( $sql );
 
         // move selected token
-        $sql = "UPDATE board SET board_player='".$player_id."', board_token=".$selected_token[1]['id']." WHERE board_action='".$action."'";
+        $sql = "UPDATE board SET board_player='".$player_id."', board_token=".$selected_token." WHERE board_action='".$action."'";
         self::DbQuery( $sql );
 
         // unselect token
-        $sql = "DELETE FROM selected_token WHERE selected_token_player_id=".$player_id;
-        // self::DbQuery( $sql );
+        $sql = "UPDATE token SET token_selected=0 WHERE token_id=".$selected_token." AND token_player='".$player_id."'";
+        self::DbQuery( $sql );
 
         // Statistics
         
@@ -303,8 +304,19 @@ class fieldofclothofgold extends Table
             'action_name' => $action
         ) );
         
-        // Notify token was used from supply
+        // tokens left in player supply
+        $sql = "SELECT COUNT(token_id) num_tokens FROM token 
+                WHERE token_location!='supply' AND
+                    token_player='".$player_id."'";
+        $remainingNumTokens = self::getUniqueValueFromDB( $sql );
 
+        // Notify token was used from supply
+        self::notifyAllPlayers( "tokensInSupply", '', array(
+            'player_id' => $player_id,
+            'tokensInSupply' => $remainingNumTokens
+        ) );
+
+        $this->gamestate->nextState( 'placedToken' );
     }
 
     /*
@@ -378,29 +390,14 @@ class fieldofclothofgold extends Table
     */
 
     function stSelectTokenFromSupply() {
+        $player_id = self::getActivePlayerID();
         // query db for player tokens in supply
-        $sql = "SELECT token_player player, token_id id, token_location loc FROM token
-                WHERE token_location='supply'";
+        $sql = "SELECT token_player player, MIN(token_id) id, token_location loc FROM token
+                WHERE token_location='supply' AND 
+                    token_player='".$player_id."'";
+        $selected_token = self::getCollectionFromDb( $sql );
 
-        $players = self::getDoubleKeyCollectionFromDB( $sql );
-        // $token = array_shift($tokens);
-
-        // `selected_token_id` smallint(5) unsigned NOT NULL,
-        // `selected_token_player_id` int(10) unsigned NOT NULL,
-        // `selected_token_location` int(10) unsigned NOT NULL,      
-        $sql = "INSERT INTO selected_token (selected_token_id, selected_token_player_id, selected_token_location) VALUES ";
-        $values = array();
-
-        foreach ( $players as $player ) {
-            $token = array_shift($player);
-            if ( $token == NULL ) {
-                continue;
-            }
-
-            $values[] = "('".$token['id']."','".$token['player']."','".$token['loc']."')";
-        }
-
-        $sql .= implode( ',', $values );
+        $sql = "UPDATE token SET token_selected=1 WHERE token_player='".$player_id."' AND token_id=".$selected_token[$player_id]['id'];
         self::DbQuery( $sql );
 
         $this->gamestate->nextState("");
@@ -410,19 +407,30 @@ class fieldofclothofgold extends Table
         // TO DO: If player has reached 30 points
         if (false) {
             $this->gamestate->nextState('endGame');
-            return;
+            return ;
         }
 
         // TO DO: If bag is out of tiles
         if (false) {
             $this->gamestate->nextState('endGame');
-            return;
+            return ;
+        }
+
+        // If player has tokens left in supply
+        $player_id = self::activeNextPlayer();
+        self::giveExtraTime($player_id);
+        $sql = "SELECT COUNT(token_id) FROM token WHERE token_location='supply' AND token_player='".$player_id."'";
+        $tokens_in_supply = self::getUniqueValueFromDB( $sql );
+
+        if ( $tokens_in_supply > 0 ) {
+            $this->gamestate->nextState( 'placeFromSupply' );
+            return ;
         }
 
         // Standard case (next turn)
-        $player_id = self::activeNextPlayer();
-        self::giveExtraTime($player_id);
-        $this->gamestate->nextState('nextPlayer');
+        throw new BgaUserException(self::_("Place from board state not implemented"));
+        // $this->gamestate->nextState( 'placeFromBoard' );
+        return ;
     }
 
     

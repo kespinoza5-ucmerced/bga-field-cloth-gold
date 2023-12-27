@@ -95,7 +95,6 @@ function (dojo, declare) {
 
             // Create cards types:
             for ( const color_id in this.gamedatas.tile_types ) {
-                // console.log('this is the color_id ', color_id)
                 let sprite_position = color_id - 1;
                 this.playerHand.addItemType(color_id, color_id, g_gamethemeurl + 'img/tiles.png', sprite_position);
             }
@@ -104,14 +103,10 @@ function (dojo, declare) {
             dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
 
             console.log('here is gamedatas ', this.gamedatas);
-            // console.log('here is hand ',this.gamedatas.hand);
-            // console.log('here is cardsontable ',this.gamedatas.cardsontable);
 
             // Cards in player's hand
             for ( let i in this.gamedatas.hand ) {
                 let tile = this.gamedatas.hand[i];
-                // console.log('tile ', tile)
-                // console.log('add to stock with id: ', tile.type, getTileUniqueType(tile.type), tile.id)
                 this.playerHand.addToStockWithId(getTileUniqueType(tile.type), tile.id);
             }
 

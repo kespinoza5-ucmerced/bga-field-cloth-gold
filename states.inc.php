@@ -78,7 +78,7 @@ $machinestates = array(
         "type" => "activeplayer",
         "args" => "argPlaceToken",
         "possibleactions" => array( "placeToken" ),
-        "transitions" => array( "placeToken" => 40 ),
+        "transitions" => array( "placedToken" => 40 ),
     ),
 
     11 => array(

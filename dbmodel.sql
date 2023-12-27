@@ -40,14 +40,8 @@ CREATE TABLE IF NOT EXISTS `token` (
   `token_id` smallint(5) unsigned NOT NULL,
   `token_player` int(10) unsigned NOT NULL,
   `token_location` varchar(10) NOT NULL DEFAULT 'supply',
+  `token_selected` BOOLEAN NOT NULL DEFAULT 0,
   PRIMARY KEY (`token_id`,`token_player`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
-
-CREATE TABLE IF NOT EXISTS `selected_token` (
-  `selected_token_id` smallint(5) unsigned NOT NULL,
-  `selected_token_player_id` int(10) unsigned NOT NULL,
-  `selected_token_location` varchar(10) NOT NULL NOT NULL,
-  PRIMARY KEY (`selected_token_id`,`selected_token_player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
 ALTER TABLE `player` ADD `player_first` BOOLEAN NOT NULL DEFAULT '0';
