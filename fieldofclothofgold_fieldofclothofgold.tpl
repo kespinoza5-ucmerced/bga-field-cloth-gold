@@ -115,7 +115,7 @@ This is your game interface. You can edit this HTML in your ".tpl" file.
 
 <script type="text/javascript">
 
-var jstpl_token='<div class="token tokencolor_${color}" id="token_${x}\"></div>';
+var jstpl_token='<div class="token token_${color}" id="token_${player_id}_${token_id}\"></div>';
 
 /*
 // Example:

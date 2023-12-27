@@ -86,9 +86,10 @@ $machinestates = array(
         "description" => clienttranslate('${actplayer} must select a token'),
         "descriptionmyturn" => clienttranslate('${you} must select a token'),
         "type" => "activeplayer",
+        "args" => "argSelectToken",
         "possibleactions" => array( "selectToken" ),
-        "transitions" => array( "selectToken" => 10 ),
-    ),  
+        "transitions" => array( "selectedToken" => 10 ),
+    ),
 
     40 => array(
         "name" => "nextPlayer",

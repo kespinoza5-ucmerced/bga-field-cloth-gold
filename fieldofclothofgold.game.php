@@ -238,6 +238,23 @@ class fieldofclothofgold extends Table
         return self::getCollectionFromDb( $sql );
     }
 
+    function getPossibleSelects() {
+        $player_id = self::getActivePlayerId();
+        $result = array();
+
+        $board = self::getBoard();
+
+        foreach ( $board as $space )
+        {
+            if ( $space['player'] == $player_id )
+            {
+                $result[$space['id']] = $space['id'];
+            }
+        }
+
+        return $result;
+    }
+
     function getPossibleMoves() {
         $result = array();
 
@@ -245,7 +262,7 @@ class fieldofclothofgold extends Table
 
         foreach ( $board as $action ) {
             if ( $action['player'] == NULL ) {
-                $result[$action["id"]] = $action["id"];
+                $result[$action['id']] = $action['id'];
             }
         }
 
@@ -299,9 +316,10 @@ class fieldofclothofgold extends Table
         
         // Notify
         self::notifyAllPlayers( "moveToken", clienttranslate( '${player_name} moves token to ${action_name}' ), array(
-            'player_id' => $player_id,
             'player_name' => self::getActivePlayerName(),
-            'action_name' => $action
+            'action_name' => $action,
+            'player_id' => $player_id,
+            'token_id' => $selected_token
         ) );
         
         // tokens left in player supply
@@ -359,6 +377,12 @@ class fieldofclothofgold extends Table
     function argPlaceToken() {
         return array (
             'possibleMoves' => self::getPossibleMoves( self::getActivePlayerId() )
+        );
+    }
+
+    function argSelectToken() {
+        return array (
+            'possibleSelects' => self::getPossibleSelects( self::getActivePlayerId() )
         );
     }
 
@@ -428,8 +452,7 @@ class fieldofclothofgold extends Table
         }
 
         // Standard case (next turn)
-        throw new BgaUserException(self::_("Place from board state not implemented"));
-        // $this->gamestate->nextState( 'placeFromBoard' );
+        $this->gamestate->nextState( 'placeFromBoard' );
         return ;
     }
 
