@@ -52,13 +52,13 @@ This is your game interface. You can edit this HTML in your ".tpl" file.
     <div id="circle_action_0" class="circle_dragon" style="left: 70px; top: 92px;"></div>
 
     <div id="tokens">
-        <div id="circle_action_1" class="circle_action" style="left: 70px; top: 145px;"></div>
-        <div id="circle_action_2" class="circle_action" style="left: 149px; top: 145px;"></div>
-        <div id="circle_action_3" class="circle_action" style="left: 242px; top: 145px;"></div>
-        <div id="circle_action_4" class="circle_action" style="left: 336px; top: 145px;"></div>
-        <div id="circle_action_5" class="circle_action" style="left: 431px; top: 145px;"></div>
-        <div id="circle_action_6" class="circle_action" style="left: 525px; top: 145px;"></div>
-        <div id="circle_action_7" class="circle_action" style="left: 619px; top: 145px;"></div>
+        <div id="circle_action_dragon" class="circle_action" style="left: 70px; top: 145px;"></div>
+        <div id="circle_action_secrecy" class="circle_action" style="left: 149px; top: 145px;"></div>
+        <div id="circle_action_gold" class="circle_action" style="left: 242px; top: 145px;"></div>
+        <div id="circle_action_blue" class="circle_action" style="left: 336px; top: 145px;"></div>
+        <div id="circle_action_white" class="circle_action" style="left: 431px; top: 145px;"></div>
+        <div id="circle_action_red" class="circle_action" style="left: 525px; top: 145px;"></div>
+        <div id="circle_action_purple" class="circle_action" style="left: 619px; top: 145px;"></div>
     </div>
 
     <!-- BEGIN square -->
@@ -115,7 +115,7 @@ This is your game interface. You can edit this HTML in your ".tpl" file.
 
 <script type="text/javascript">
 
-var jstpl_token='<div class="token tokencolor_${color}" id="token_${x}\"></div>';
+var jstpl_token='<div class="token token_${color}" id="token_${player_id}_${token_id}\"></div>';
 
 /*
 // Example:
