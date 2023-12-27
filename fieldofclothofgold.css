@@ -102,6 +102,7 @@
 .token {
     width: 36px;
     height: 36px;
+    border-radius: 50%;
     position: absolute;
     background-image: url('img/tokens.png');
 }

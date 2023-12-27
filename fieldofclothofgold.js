@@ -251,10 +251,11 @@ function (dojo, declare) {
             console.log('made it to updateSelect')
             var color = this.gamedatas.players[this.player_id].color;
 
-            for( var space of Object.values(possibleSelects) )
+            for( var token of Object.values(possibleSelects) )
             {
-                // token_ff0000
-                dojo.addClass( 'token_'+color, 'possible_select' );
+                var token_selector = 'token_'+token.player+'_'+token.token;
+                
+                dojo.addClass( token_selector, 'possible_select' );
             }
 
             this.addTooltipToClass( 'possible_select', '', _('Select token') );
@@ -343,10 +344,9 @@ function (dojo, declare) {
 
             // // Get the clicked circle x
             // // Note: circle id format is "circle_action_X"
-            var coords = evt.currentTarget.id.split('_');
-            var token_id = coords[0];
-
-            // check that action string is possible string
+            var token = evt.currentTarget.id.split('_');
+            var player_id = token[1];
+            var token_id = token[2];
 
             // if( ! dojo.hasClass( 'circle_action_'+x, 'possibleMove' ) )
             // {
@@ -355,7 +355,7 @@ function (dojo, declare) {
             // }
 
             var action = 'selectToken';
-            console.log("on "+action + 'token id' + token_id);
+            console.log('on '+action+'move token '+token_id);
 
             // if (this.checkAction(action, true)) {
             //     // Can move a token
