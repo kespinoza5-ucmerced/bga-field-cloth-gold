@@ -60,18 +60,45 @@ $machinestates = array(
         "action" => "stGameSetup",
         "transitions" => array( "" => 2 )
     ),
-    
-    // Note: ID=2 => your first state
 
+    /// New hand
     2 => array(
-    		"name" => "playerTurn",
-    		"description" => clienttranslate('${actplayer} must play a card or pass'),
-    		"descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
-    		"type" => "activeplayer",
-    		"possibleactions" => array( "playCard", "pass" ),
-    		"transitions" => array( "playCard" => 2, "pass" => 2 )
+        "name" => "selectTokenFromSupply",
+        "description" => "",
+        "type" => "game",
+        "action" => "stSelectTokenFromSupply",
+        // "updateGameProgression" => true,
+        "transitions" => array( "" => 10 )
     ),
     
+    10 => array(
+        "name" => "placeToken",
+        "description" => clienttranslate('${actplayer} must place a token'),
+        "descriptionmyturn" => clienttranslate('${you} must place a token'),
+        "type" => "activeplayer",
+        "args" => "argPlaceToken",
+        "possibleactions" => array( "placeToken" ),
+        "transitions" => array( "placedToken" => 40 ),
+    ),
+
+    11 => array(
+        "name" => "selectToken",
+        "description" => clienttranslate('${actplayer} must select a token'),
+        "descriptionmyturn" => clienttranslate('${you} must select a token'),
+        "type" => "activeplayer",
+        "possibleactions" => array( "selectToken" ),
+        "transitions" => array( "selectToken" => 10 ),
+    ),  
+
+    40 => array(
+        "name" => "nextPlayer",
+        "type" => "game",
+        "action" => "stNextPlayer",
+        "updateGameProgression" => true,        
+        "transitions" => array( "placeFromSupply" => 2, "placeFromBoard" => 11, "endGame" => 99 )
+    ),
+    
+
 /*
     Examples:
     

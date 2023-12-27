@@ -41,6 +41,19 @@
   	
   	// TODO: defines your action entry points there
 
+    // public function dragonSelected() {
+    //     self::setAjaxMode();
+    //     $tile_id = self::getArg("id", AT_posint, true);
+    //     $this->game->playTile($tile_id);
+    //     self::ajaxResponse();
+    // }
+
+    public function placeToken() {
+        self::setAjaxMode();
+        $oval_id = self::getArg("x", AT_alphanum, true);
+        $this->game->placeToken($oval_id);
+        self::ajaxResponse();
+    }
 
     /*
     
