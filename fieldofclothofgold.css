@@ -105,9 +105,9 @@
     position: absolute;
     background-image: url('img/tokens.png');
 }
-.token_ff0000 { background-position: 180px 0px; }
+.token_ff0000 { background-position: -215px 0px; }
 .token_0000ff { background-position: 0px 0px; }
-.token_ffffff { background-position: 120px 0px; }
+.token_ffffff { background-position: -144px 0px; }
 
 #playertables {
     display: flex;

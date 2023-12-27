@@ -316,9 +316,10 @@ class fieldofclothofgold extends Table
         
         // Notify
         self::notifyAllPlayers( "moveToken", clienttranslate( '${player_name} moves token to ${action_name}' ), array(
-            'player_id' => $player_id,
             'player_name' => self::getActivePlayerName(),
-            'action_name' => $action
+            'action_name' => $action,
+            'player_id' => $player_id,
+            'token_id' => $selected_token
         ) );
         
         // tokens left in player supply

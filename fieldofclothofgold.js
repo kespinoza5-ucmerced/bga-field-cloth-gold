@@ -41,7 +41,6 @@ function (dojo, declare) {
             // Example:
             // this.myGlobalValue = 0;
 
-            console.log('hearts constructor');
             this.cardwidth = 56;
             this.cardheight = 56;
         },
@@ -62,7 +61,7 @@ function (dojo, declare) {
         setup: function( gamedatas )
         {
             console.log( "Starting game setup" );
-            // console.log('here it is ',this)
+            console.log('here is gamedatas ',this.gamedatas)
             
             this.tableau = {};
 
@@ -102,8 +101,6 @@ function (dojo, declare) {
             // hook up player hand ??
             dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
 
-            console.log('here is gamedatas ', this.gamedatas);
-
             // Cards in player's hand
             for ( let i in this.gamedatas.hand ) {
                 let tile = this.gamedatas.hand[i];
@@ -117,9 +114,15 @@ function (dojo, declare) {
                 this.playTileOnTable(player_id, tile.id, tile.stock_id);
             }
 
-            // dojo.query( 'tokens' ).connect( 'onclick', this, 'onMoveToken' );
+            for ( var [space, arg] of Object.entries(this.gamedatas.board) )
+            {
+                if ( arg.player != null ) {
+                    // function( action_name, player_id, token_id )
+                    this.addTokenOnBoard(space, arg.player, arg.id);
+                }
+            }
 
-            // this.addTokenOnBoard( 2, this.player_id );
+            // dojo.query( 'tokens' ).connect( 'onclick', this, 'onMoveToken' );
 
             dojo.query( '.circle_action' ).connect( 'onclick', this, 'onPlaceToken' );
             dojo.query( '.possible_select' ).connect( 'onclick', this, 'onSelectToken' );
@@ -182,14 +185,12 @@ function (dojo, declare) {
 
             switch( stateName )
             {       
-                case 'placeToken':
-                    // Remove current possible moves
-                    dojo.query( '.possible_move' ).removeClass( 'possible_move' );
-                    
+                case 'placeToken':        
+                    dojo.query( '.possible_move' ).removeClass( 'possible_move' );            
                     break;
 
                 case 'selectToken':
-                    dojo.query( '.possible_select' ).removeClass( 'possible_select' );
+                    // dojo.query( '.possible_select' ).removeClass( 'possible_select' );
 
                     break;
             }               
@@ -274,15 +275,20 @@ function (dojo, declare) {
             }
         },
 
-        addTokenOnBoard: function( x, player )
+        addTokenOnBoard: function( action_name, player_id, token_id )
         {
+            console.log('in addTokenOnBoard')
+
             dojo.place( this.format_block( 'jstpl_token', {
-                x: x,
-                color: this.gamedatas.players[ player ].color
+                color: this.gamedatas.players[ player_id ].color,
+                player_id: player_id,
+                token_id: token_id
             } ) , 'tokens' );
             
-            this.placeOnObject( 'token_'+x, 'overall_player_board_'+player );
-            this.slideToObject( 'token_'+x, 'circle_action_'+action_spaces[x] ).play();
+            var token_selector = 'token_'+player_id+'_'+token_id;
+
+            this.placeOnObject( token_selector, 'overall_player_board_'+player_id );
+            this.slideToObject( token_selector, 'circle_action_'+action_name ).play();
         },
 
 
@@ -300,6 +306,8 @@ function (dojo, declare) {
         
         */
 
+        
+
         onPlaceToken: function( evt ) {
             dojo.stopEvent( evt );
 
@@ -309,11 +317,10 @@ function (dojo, declare) {
             var x = coords[2];
             console.log("here is the action", x)
 
-            // check that action string is possible string
-
+            // // check that polled action is possible
             // if( ! dojo.hasClass( 'circle_action_'+x, 'possibleMove' ) )
             // {
-            //     // This is not a possible move => the click does nothing
+            //     console.log('move is not possible')
             //     return ;
             // }
 
@@ -446,6 +453,9 @@ function (dojo, declare) {
             console.log( 'notifications subscriptions setup' );
             
             // TODO: here, associate your game notifications with local methods
+
+            dojo.subscribe( 'moveToken', this, "notif_moveToken" );
+            this.notifqueue.setSynchronous( 'moveToken', 500 );
             
             // Example 1: standard notification handling
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
@@ -460,6 +470,15 @@ function (dojo, declare) {
         
         // TODO: from this point and below, you can write your game notifications handling methods
         
+        notif_moveToken: function( notif )
+        {
+            // Remove current possible moves (makes the board more clear)
+            dojo.query( '.possibleMove' ).removeClass( 'possibleMove' );
+        
+            this.addTokenOnBoard( notif.args.action_name, notif.args.player_id, notif.args.token_id );
+        },
+
+
         /*
         Example:
         
