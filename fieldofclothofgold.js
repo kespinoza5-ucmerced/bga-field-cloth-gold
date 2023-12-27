@@ -118,14 +118,14 @@ function (dojo, declare) {
             {
                 if ( arg.player != null ) {
                     // function( action_name, player_id, token_id )
-                    this.addTokenOnBoard(space, arg.player, arg.id);
+                    this.addTokenOnBoard(space, arg.player, arg.token);
                 }
             }
 
             // dojo.query( 'tokens' ).connect( 'onclick', this, 'onMoveToken' );
 
             dojo.query( '.circle_action' ).connect( 'onclick', this, 'onPlaceToken' );
-            dojo.query( '.possible_select' ).connect( 'onclick', this, 'onSelectToken' );
+            dojo.query( '.token' ).connect( 'onclick', this, 'onSelectToken' );
  
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -138,7 +138,6 @@ function (dojo, declare) {
             //     // }
 
             // }, true);
-            
 
             console.log( "Ending game setup" );
         },
@@ -250,10 +249,12 @@ function (dojo, declare) {
         updatePossibleSelects: function( possibleSelects )
         {
             console.log('made it to updateSelect')
+            var color = this.gamedatas.players[this.player_id].color;
 
             for( var space of Object.values(possibleSelects) )
             {
-                dojo.addClass( 'circle_action_'+space, 'possible_select' );
+                // token_ff0000
+                dojo.addClass( 'token_'+color, 'possible_select' );
             }
 
             this.addTooltipToClass( 'possible_select', '', _('Select token') );
@@ -342,9 +343,8 @@ function (dojo, declare) {
 
             // // Get the clicked circle x
             // // Note: circle id format is "circle_action_X"
-            // var coords = evt.currentTarget.id.split('_');
-            // var x = coords[2];
-            // console.log("here is the action", x)
+            var coords = evt.currentTarget.id.split('_');
+            var token_id = coords[0];
 
             // check that action string is possible string
 
@@ -355,7 +355,7 @@ function (dojo, declare) {
             // }
 
             var action = 'selectToken';
-            console.log("on "+action+" to "+x);
+            console.log("on "+action + 'token id' + token_id);
 
             // if (this.checkAction(action, true)) {
             //     // Can move a token
@@ -474,7 +474,7 @@ function (dojo, declare) {
         {
             // Remove current possible moves (makes the board more clear)
             dojo.query( '.possibleMove' ).removeClass( 'possibleMove' );
-        
+
             this.addTokenOnBoard( notif.args.action_name, notif.args.player_id, notif.args.token_id );
         },
 

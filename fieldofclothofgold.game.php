@@ -174,10 +174,7 @@ class fieldofclothofgold extends Table
         $result['tile_types'] = $this->colors;
         $result['sack'] = $this->sack;
         $result['possibleMoves'] = self::getPossibleMoves();
-        $sql = "SELECT token_player player, MIN(token_id) id, token_location loc FROM token
-                WHERE token_location='supply' AND 
-                    token_player='".$current_player_id."'";
-        $result['selected_token'] = self::getCollectionFromDb( $sql );
+        $result['possibleSelects'] = self::getPossibleSelects();
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
         // Cards in player hand
@@ -248,7 +245,7 @@ class fieldofclothofgold extends Table
         {
             if ( $space['player'] == $player_id )
             {
-                $result[$space['id']] = $space['id'];
+                $result[$space['id']] = $space;
             }
         }
 
