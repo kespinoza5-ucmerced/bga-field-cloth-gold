@@ -93,6 +93,7 @@
 .possible_select {
     border-style: solid;
     border-color: #ffff00;
+    cursor: pointer;
 }
 
 .square {
