@@ -122,6 +122,7 @@ function (dojo, declare) {
             // this.addTokenOnBoard( 2, this.player_id );
 
             dojo.query( '.circle_action' ).connect( 'onclick', this, 'onPlaceToken' );
+            dojo.query( '.possible_select' ).connect( 'onclick', this, 'onSelectToken' );
  
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -152,9 +153,21 @@ function (dojo, declare) {
             
             switch( stateName )
             {        
-            case 'placeToken':
-                this.updatePossibleMoves( args.args.possibleMoves );
-                break;
+                case 'placeToken':
+                    if ( this.player_id == args.active_player ) 
+                    {
+                        this.updatePossibleMoves( args.args.possibleMoves );
+                    }
+
+                    break;
+                    
+                case 'selectToken':
+                    if ( this.player_id == args.active_player ) 
+                    {
+                        this.updatePossibleSelects( args.args.possibleSelects );
+                    }
+
+                    break;
             }
         },
 
@@ -165,10 +178,20 @@ function (dojo, declare) {
         {
             console.log( 'Leaving state: '+stateName );
             
+            
+
             switch( stateName )
             {       
-            case 'dummmy':
-                break;
+                case 'placeToken':
+                    // Remove current possible moves
+                    dojo.query( '.possible_move' ).removeClass( 'possible_move' );
+                    
+                    break;
+
+                case 'selectToken':
+                    dojo.query( '.possible_select' ).removeClass( 'possible_select' );
+
+                    break;
             }               
         }, 
 
@@ -211,7 +234,7 @@ function (dojo, declare) {
 
         updatePossibleMoves: function( possibleMoves )
         {
-            console.log('made it to updatePossible')
+            console.log('made it to updateMove')
             // Remove current possible moves
             dojo.query( '.possible_move' ).removeClass( 'possible_move' );
 
@@ -220,9 +243,20 @@ function (dojo, declare) {
                 dojo.addClass( 'circle_action_'+space, 'possible_move' );
             }
                         
-            this.addTooltipToClass( 'possibleMove', '', _('Place a token here') );
+            this.addTooltipToClass( 'possibleMove', '', _('Place token here') );
         },
     
+        updatePossibleSelects: function( possibleSelects )
+        {
+            console.log('made it to updateSelect')
+
+            for( var space of Object.values(possibleSelects) )
+            {
+                dojo.addClass( 'circle_action_'+space, 'possible_select' );
+            }
+
+            this.addTooltipToClass( 'possible_select', '', _('Select token') );
+        },
 
         playTileOnTable : function(player_id, color, tile_id) {
             if (player_id != this.player_id) {
@@ -294,6 +328,36 @@ function (dojo, declare) {
                 }, function(is_error) {
                 });
             }
+        },
+
+        onSelectToken: function( evt ) {
+            dojo.stopEvent( evt );
+
+            // // Get the clicked circle x
+            // // Note: circle id format is "circle_action_X"
+            // var coords = evt.currentTarget.id.split('_');
+            // var x = coords[2];
+            // console.log("here is the action", x)
+
+            // check that action string is possible string
+
+            // if( ! dojo.hasClass( 'circle_action_'+x, 'possibleMove' ) )
+            // {
+            //     // This is not a possible move => the click does nothing
+            //     return ;
+            // }
+
+            var action = 'selectToken';
+            console.log("on "+action+" to "+x);
+
+            // if (this.checkAction(action, true)) {
+            //     // Can move a token
+            //     this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+            //         x:x
+            //     }, this, function(result) {
+            //     }, function(is_error) {
+            //     });
+            // }
         },
 
         onPlayerHandSelectionChanged: function() {
