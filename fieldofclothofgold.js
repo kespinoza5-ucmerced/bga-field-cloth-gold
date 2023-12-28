@@ -114,18 +114,7 @@ function (dojo, declare) {
                 this.playTileOnTable(player_id, tile.id, tile.stock_id);
             }
 
-            for ( var [space, arg] of Object.entries(this.gamedatas.board) )
-            {
-                if ( arg.player != null ) {
-                    // function( action_name, player_id, token_id )
-                    this.addTokenOnBoard(space, arg.player, arg.token);
-                }
-            }
-
-            console.log('just before placing tokens')
-
             // place tokens in player supplies
-            // var [space, arg] of Object.entries(this.gamedatas.board)
             for ( let [player, tokens] of Object.entries(this.gamedatas.tokens) )
             {
                 for ( let token of Object.values(tokens) ) {
@@ -140,7 +129,13 @@ function (dojo, declare) {
                 }
             }
 
-            console.log('survived placing tokens')
+            for ( var [space, arg] of Object.entries(this.gamedatas.board) )
+            {
+                if ( arg.player != null ) {
+                    // function( action_name, player_id, token_id )
+                    this.addTokenOnBoard(space, arg.player, arg.token);
+                }
+            }
 
             // dojo.query( 'tokens' ).connect( 'onclick', this, 'onMoveToken' );
 
