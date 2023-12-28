@@ -127,25 +127,6 @@
     justify-content: left;
 }
 
-.playertabletile {
-    display: inline-block;
-    position: relative;
-    margin-top: 5px;
-    width: 150px;
-    height: 150px;
-    /* we remove background-image here */
-}
-
-/*** cards on table ***/
-
-.tileontable {
-    position: absolute;
-    width: 150px;
-    height: 150px;
-    background-image: url('img/tiles.png');
-    background-size: 275px;
-}
-
 .tile {
     width: 50px;
     height: 50px;
