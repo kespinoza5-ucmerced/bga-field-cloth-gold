@@ -175,6 +175,7 @@ class fieldofclothofgold extends Table
         $result['sack'] = $this->sack;
         $result['possibleMoves'] = self::getPossibleMoves();
         $result['possibleSelects'] = self::getPossibleSelects();
+        $result['tokens'] = self::getTokens();
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
         // Cards in player hand
@@ -212,6 +213,22 @@ class fieldofclothofgold extends Table
         In this space, you can put any utility methods useful for your game logic
     */
 
+    
+
+    function tokenSelectionIsValid( $player, $token, $tokens ) {
+        if ( ! array_key_exists( $player, $tokens) )
+        {
+            return false;
+        }
+
+        if ( ! array_key_exists( $token, $tokens[$player] ) ) 
+        {
+            return false;
+        }
+
+        return true;
+    }   
+
     function tokenPlacementIsValid( $action, $board ) {
         if (! array_key_exists($action, $board)) {
             return false;
@@ -228,6 +245,11 @@ class fieldofclothofgold extends Table
         }
 
         return true;
+    }
+
+    function getTokens() {
+        $sql = "SELECT token_player player, token_id id, token_location loc , token_selected selected FROM token";
+        return self::getDoubleKeyCollectionFromDB( $sql );
     }
 
     function getBoard() {
@@ -274,6 +296,40 @@ class fieldofclothofgold extends Table
         Each time a player is doing some game action, one of the methods below is called.
         (note: each method below must match an input method in fieldofclothofgold.action.php)
     */
+
+    function selectToken($player_id, $token_id) {
+        self::checkAction("selectToken");
+
+        // check that player token was selected
+        $tokens = self::getTokens();
+        if ( ! self::tokenSelectionIsValid( $player_id, $token_id, $tokens ) )
+        {
+            throw new BgaUserException(self::_("Move not valid: ") . "$player_id selects their token $token_id");
+        }
+
+        $current_player_id = self::getActivePlayerId();
+        $action_space =  $tokens[$current_player_id][$token_id]['loc'];
+
+        // update db to select token
+        $sql = "UPDATE token SET token_selected=1 
+                WHERE token_player='".$current_player_id."' AND
+                    token_id=".$token_id;
+        self::DbQuery( $sql );
+
+        // Statistics
+        
+        // Notify
+        self::notifyAllPlayers( "selectToken", clienttranslate( '${player_name} selects token on ${action_name} space' ), array(
+            'player_name' => self::getActivePlayerName(),
+            'action_name' => $action_space,
+            'player_id' => $player_id,
+            'token_id' => $token_id
+        ) );
+
+        $this->gamestate->nextState( 'selectedToken' );
+
+        // throw new BgaUserException(self::_("Not implemented: ") . "token $player_id - $token_id placed");
+    }
 
     function placeToken($action) {
         self::checkAction("placeToken");

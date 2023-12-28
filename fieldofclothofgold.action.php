@@ -55,6 +55,16 @@
         self::ajaxResponse();
     }
 
+    // player: player_id,
+    // token: token_id
+    public function selectToken() {
+        self::setAjaxMode();
+        $player_id = self::getArg("player", AT_alphanum, true);
+        $token_id = self::getArg("token", AT_posint, true);
+        $this->game->selectToken($player_id, $token_id);
+        self::ajaxResponse();
+    }
+
     /*
     
     Example:

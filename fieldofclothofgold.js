@@ -189,7 +189,7 @@ function (dojo, declare) {
                     break;
 
                 case 'selectToken':
-                    // dojo.query( '.possible_select' ).removeClass( 'possible_select' );
+                    dojo.query( '.possible_select' ).removeClass( 'possible_select' );
 
                     break;
             }               
@@ -293,6 +293,22 @@ function (dojo, declare) {
             this.slideToObject( token_selector, 'circle_action_'+action_name ).play();
         },
 
+        moveTokenOnBoard: function( action_name, player_id, token_id )
+        {
+            console.log('in moveTokenOnBoard')
+
+            dojo.place( this.format_block( 'jstpl_token', {
+                color: this.gamedatas.players[ player_id ].color,
+                player_id: player_id,
+                token_id: token_id
+            } ) , 'tokens' );
+            
+            var token_selector = 'token_'+player_id+'_'+token_id;
+
+            this.placeOnObject( token_selector, 'overall_player_board_'+player_id );
+            this.slideToObject( token_selector, 'circle_action_'+action_name ).play();
+        },
+
 
         ///////////////////////////////////////////////////
         //// Player's action
@@ -357,14 +373,15 @@ function (dojo, declare) {
             var action = 'selectToken';
             console.log('on '+action+'move token '+token_id);
 
-            // if (this.checkAction(action, true)) {
-            //     // Can move a token
-            //     this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
-            //         x:x
-            //     }, this, function(result) {
-            //     }, function(is_error) {
-            //     });
-            // }
+            if (this.checkAction(action, true)) {
+                // Can move a token
+                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                    player: player_id,
+                    token: token_id
+                }, this, function(result) {
+                }, function(is_error) {
+                });
+            }
         },
 
         onPlayerHandSelectionChanged: function() {
