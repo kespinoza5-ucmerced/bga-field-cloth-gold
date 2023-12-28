@@ -15,16 +15,6 @@
  *
  */
 
- action_spaces = { 
-    1: "dragon",
-    2: "secrecy",
-    3: "gold",
-    4: "blue",
-    5: "white",
-    6: "red",
-    7: "purple"
-}
-
 define([
     "dojo","dojo/_base/declare",
     "ebg/core/gamegui",
@@ -136,6 +126,12 @@ function (dojo, declare) {
                     this.addTokenOnBoard(space, arg.player, arg.token);
                 }
             }
+
+            for ( let [id, tile] of Object.entries(this.gamedatas.tilesonboard) )
+            {
+                this.addTileOnBoard( tile );
+            }
+            // asdf
 
             // dojo.query( 'tokens' ).connect( 'onclick', this, 'onMoveToken' );
 
@@ -306,6 +302,27 @@ function (dojo, declare) {
 
             // this.placeOnObject( token_selector, 'overall_player_board_'+player_id );
             this.slideToObject( token_selector, 'circle_action_'+action_name ).play();
+        },
+
+        // qwer
+        addTileOnBoard: function( tile )
+        {
+            console.log('in addTileOnBoard')
+
+            console.log('tile', tile)
+            console.log('color', tile.type)
+            console.log('tile_id', tile.id)
+
+            dojo.place( this.format_block( 'jstpl_tile', {
+                color: tile.type,
+                tile_id: tile.id
+            } ) , 'tiles' );
+
+            var action_selector = 'square_'+this.gamedatas.actions[tile.location_arg];
+            var tile_selector = 'tile_'+tile.id;
+            console.log('action',action_selector)
+            this.placeOnObject( tile_selector, action_selector );
+            this.slideToObject( tile_selector, action_selector ).play();
         },
 
         ///////////////////////////////////////////////////

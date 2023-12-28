@@ -100,8 +100,6 @@
     width: 50px;
     height: 50px;
     position: absolute;
-    border-style: solid;
-    border-color: #ff0000;
 }
 
 .token {
@@ -127,24 +125,19 @@
     justify-content: left;
 }
 
-.playertabletile {
-    display: inline-block;
-    position: relative;
-    margin-top: 5px;
-    width: 150px;
-    height: 150px;
-    /* we remove background-image here */
-}
-
-/*** cards on table ***/
-
-.tileontable {
-    position: absolute;
-    width: 150px;
-    height: 150px;
+.tile {
+    width: 50px;
+    height: 50px;
     background-image: url('img/tiles.png');
-    background-size: 275px;
+    background-size: 250px;
+    position: absolute;
 }
+
+.tile_blue { background-position: 0px 0px; }
+.tile_red { background-position: -50px 0px; }
+.tile_gold { background-position: -100px 0px; }
+.tile_white { background-position: -150px 0px; }
+.tile_green { background-position: -200px 0px; }
 
 /*
     Example of CSS sprites (a black token and a white token, 20x20px each, embedded in the same "tokens.png" 40x20px image):

@@ -61,9 +61,11 @@ This is your game interface. You can edit this HTML in your ".tpl" file.
         <div id="circle_action_purple" class="circle_action" style="left: 619px; top: 145px;"></div>
     </div>
 
-    <!-- BEGIN square -->
-    <div id="square_{X}" class="square" style="left: {LEFT}px; top: {TOP}px;"></div>
-    <!-- END square -->
+    <div id="tiles">
+        <!-- BEGIN square -->
+        <div id="square_{X}" class="square" style="left: {LEFT}px; top: {TOP}px;"></div>
+        <!-- END square -->
+    </div>
 
     <div id="score_track">
         <div id="score_track_0" class="circle_score" style="left: 328px; top: 292px;"></div>
@@ -116,6 +118,7 @@ This is your game interface. You can edit this HTML in your ".tpl" file.
 <script type="text/javascript">
 
 var jstpl_token='<div class="token token_${color}" id="token_${player_id}_${token_id}\"></div>';
+var jstpl_tile='<div class="tile tile_${color}" id="tile_${tile_id}\"></div>';
 
 /*
 // Example:
