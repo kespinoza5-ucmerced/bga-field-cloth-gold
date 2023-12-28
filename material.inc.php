@@ -36,6 +36,16 @@ $this->card_types = array(
 //   'green'
 // )
 
+$this->actions = array(
+    1 => "dragon",
+    2 => "secrecy",
+    3 => "gold",
+    4 => "blue",
+    5 => "white",
+    6 => "red",
+    7 => "purple"
+);
+
 $this->colors = array(
   1 => array( 'name' => clienttranslate('blue'),
               'nametr' => self::_('blue') ),

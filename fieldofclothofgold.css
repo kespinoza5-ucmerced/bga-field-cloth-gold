@@ -100,8 +100,6 @@
     width: 50px;
     height: 50px;
     position: absolute;
-    border-style: solid;
-    border-color: #ff0000;
 }
 
 .token {

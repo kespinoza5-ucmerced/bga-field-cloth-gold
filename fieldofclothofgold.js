@@ -15,16 +15,6 @@
  *
  */
 
- action_spaces = { 
-    1: "dragon",
-    2: "secrecy",
-    3: "gold",
-    4: "blue",
-    5: "white",
-    6: "red",
-    7: "purple"
-}
-
 define([
     "dojo","dojo/_base/declare",
     "ebg/core/gamegui",
@@ -137,10 +127,11 @@ function (dojo, declare) {
                 }
             }
 
-            // place tile
-            tile = { 'id': 1, 'color': 'green' };
-            action = 'white';
-            this.addTileOnBoard( tile, action);
+            for ( let [id, tile] of Object.entries(this.gamedatas.tilesonboard) )
+            {
+                this.addTileOnBoard( tile );
+            }
+            // asdf
 
             // dojo.query( 'tokens' ).connect( 'onclick', this, 'onMoveToken' );
 
@@ -313,21 +304,26 @@ function (dojo, declare) {
             this.slideToObject( token_selector, 'circle_action_'+action_name ).play();
         },
 
-        addTileOnBoard: function( tile, action )
+        // qwer
+        addTileOnBoard: function( tile )
         {
             console.log('in addTileOnBoard')
 
+            console.log('tile', tile)
+            console.log('color', tile.type)
+            console.log('tile_id', tile.id)
+
             dojo.place( this.format_block( 'jstpl_tile', {
-                color: tile['color'],
-                tile_id: tile['id']
+                color: tile.type,
+                tile_id: tile.id
             } ) , 'tiles' );
 
-            let tile_selector = 'tile_'+tile['id'];
-            this.placeOnObject( tile_selector, 'overall_player_board_'+this.player_id );
-            this.slideToObject( tile_selector, 'square_'+action ).play();
-
+            var action_selector = 'square_'+this.gamedatas.actions[tile.location_arg];
+            var tile_selector = 'tile_'+tile.id;
+            console.log('action',action_selector)
+            this.placeOnObject( tile_selector, action_selector );
+            this.slideToObject( tile_selector, action_selector ).play();
         },
-
 
         ///////////////////////////////////////////////////
         //// Player's action
