@@ -118,14 +118,14 @@ function (dojo, declare) {
             {
                 if ( arg.player != null ) {
                     // function( action_name, player_id, token_id )
-                    this.addTokenOnBoard(space, arg.player, arg.id);
+                    this.addTokenOnBoard(space, arg.player, arg.token);
                 }
             }
 
             // dojo.query( 'tokens' ).connect( 'onclick', this, 'onMoveToken' );
 
             dojo.query( '.circle_action' ).connect( 'onclick', this, 'onPlaceToken' );
-            dojo.query( '.possible_select' ).connect( 'onclick', this, 'onSelectToken' );
+            dojo.query( '.token' ).connect( 'onclick', this, 'onSelectToken' );
  
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -138,7 +138,6 @@ function (dojo, declare) {
             //     // }
 
             // }, true);
-            
 
             console.log( "Ending game setup" );
         },
@@ -190,7 +189,7 @@ function (dojo, declare) {
                     break;
 
                 case 'selectToken':
-                    // dojo.query( '.possible_select' ).removeClass( 'possible_select' );
+                    dojo.query( '.possible_select' ).removeClass( 'possible_select' );
 
                     break;
             }               
@@ -250,10 +249,13 @@ function (dojo, declare) {
         updatePossibleSelects: function( possibleSelects )
         {
             console.log('made it to updateSelect')
+            var color = this.gamedatas.players[this.player_id].color;
 
-            for( var space of Object.values(possibleSelects) )
+            for( var token of Object.values(possibleSelects) )
             {
-                dojo.addClass( 'circle_action_'+space, 'possible_select' );
+                var token_selector = 'token_'+token.player+'_'+token.token;
+                
+                dojo.addClass( token_selector, 'possible_select' );
             }
 
             this.addTooltipToClass( 'possible_select', '', _('Select token') );
@@ -278,6 +280,22 @@ function (dojo, declare) {
         addTokenOnBoard: function( action_name, player_id, token_id )
         {
             console.log('in addTokenOnBoard')
+
+            dojo.place( this.format_block( 'jstpl_token', {
+                color: this.gamedatas.players[ player_id ].color,
+                player_id: player_id,
+                token_id: token_id
+            } ) , 'tokens' );
+            
+            var token_selector = 'token_'+player_id+'_'+token_id;
+
+            this.placeOnObject( token_selector, 'overall_player_board_'+player_id );
+            this.slideToObject( token_selector, 'circle_action_'+action_name ).play();
+        },
+
+        moveTokenOnBoard: function( action_name, player_id, token_id )
+        {
+            console.log('in moveTokenOnBoard')
 
             dojo.place( this.format_block( 'jstpl_token', {
                 color: this.gamedatas.players[ player_id ].color,
@@ -342,11 +360,9 @@ function (dojo, declare) {
 
             // // Get the clicked circle x
             // // Note: circle id format is "circle_action_X"
-            // var coords = evt.currentTarget.id.split('_');
-            // var x = coords[2];
-            // console.log("here is the action", x)
-
-            // check that action string is possible string
+            var token = evt.currentTarget.id.split('_');
+            var player_id = token[1];
+            var token_id = token[2];
 
             // if( ! dojo.hasClass( 'circle_action_'+x, 'possibleMove' ) )
             // {
@@ -355,16 +371,17 @@ function (dojo, declare) {
             // }
 
             var action = 'selectToken';
-            console.log("on "+action+" to "+x);
+            console.log('on '+action+'move token '+token_id);
 
-            // if (this.checkAction(action, true)) {
-            //     // Can move a token
-            //     this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
-            //         x:x
-            //     }, this, function(result) {
-            //     }, function(is_error) {
-            //     });
-            // }
+            if (this.checkAction(action, true)) {
+                // Can move a token
+                this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
+                    player: player_id,
+                    token: token_id
+                }, this, function(result) {
+                }, function(is_error) {
+                });
+            }
         },
 
         onPlayerHandSelectionChanged: function() {
@@ -474,7 +491,7 @@ function (dojo, declare) {
         {
             // Remove current possible moves (makes the board more clear)
             dojo.query( '.possibleMove' ).removeClass( 'possibleMove' );
-        
+
             this.addTokenOnBoard( notif.args.action_name, notif.args.player_id, notif.args.token_id );
         },
 

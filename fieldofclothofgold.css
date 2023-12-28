@@ -83,12 +83,17 @@
 
 .possible_move {
     border-style: solid;
-    border-color: #ffff00;
+    border-color: #ff0000;
+    background-color: #ff0000;
+    opacity: 0.4;
+    filter:alpha(opacity=40); /* For IE8 and earlier */  
+    cursor: pointer;
 }
 
 .possible_select {
     border-style: solid;
     border-color: #ffff00;
+    cursor: pointer;
 }
 
 .square {
@@ -102,6 +107,7 @@
 .token {
     width: 36px;
     height: 36px;
+    border-radius: 50%;
     position: absolute;
     background-image: url('img/tokens.png');
 }
