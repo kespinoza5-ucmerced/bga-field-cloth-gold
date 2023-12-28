@@ -132,6 +132,7 @@
     height: 50px;
     background-image: url('img/tiles.png');
     background-size: 250px;
+    position: absolute;
 }
 
 .tile_blue { background-position: 0px 0px; }

@@ -137,6 +137,11 @@ function (dojo, declare) {
                 }
             }
 
+            // place tile
+            tile = { 'id': 1, 'color': 'green' };
+            action = 'white';
+            this.addTileOnBoard( tile, action);
+
             // dojo.query( 'tokens' ).connect( 'onclick', this, 'onMoveToken' );
 
             dojo.query( '.circle_action' ).connect( 'onclick', this, 'onPlaceToken' );
@@ -307,6 +312,22 @@ function (dojo, declare) {
             // this.placeOnObject( token_selector, 'overall_player_board_'+player_id );
             this.slideToObject( token_selector, 'circle_action_'+action_name ).play();
         },
+
+        addTileOnBoard: function( tile, action )
+        {
+            console.log('in addTileOnBoard')
+
+            dojo.place( this.format_block( 'jstpl_tile', {
+                color: tile['color'],
+                tile_id: tile['id']
+            } ) , 'tiles' );
+
+            let tile_selector = 'tile_'+tile['id'];
+            this.placeOnObject( tile_selector, 'overall_player_board_'+this.player_id );
+            this.slideToObject( tile_selector, 'square_'+action ).play();
+
+        },
+
 
         ///////////////////////////////////////////////////
         //// Player's action
