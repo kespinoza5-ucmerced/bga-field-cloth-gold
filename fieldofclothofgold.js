@@ -114,6 +114,21 @@ function (dojo, declare) {
                 this.playTileOnTable(player_id, tile.id, tile.stock_id);
             }
 
+            // place tokens in player supplies
+            for ( let [player, tokens] of Object.entries(this.gamedatas.tokens) )
+            {
+                for ( let token of Object.values(tokens) ) {
+                    dojo.place( this.format_block( 'jstpl_token', {
+                        color: this.gamedatas.players[ player ].color,
+                        player_id: player,
+                        token_id: token.id
+                    } ) , 'tokens' );
+
+                    let token_selector = 'token_'+player+'_'+token.id;
+                    this.placeOnObject( token_selector, 'overall_player_board_'+player );
+                }
+            }
+
             for ( var [space, arg] of Object.entries(this.gamedatas.board) )
             {
                 if ( arg.player != null ) {
@@ -281,34 +296,17 @@ function (dojo, declare) {
         {
             console.log('in addTokenOnBoard')
 
-            dojo.place( this.format_block( 'jstpl_token', {
-                color: this.gamedatas.players[ player_id ].color,
-                player_id: player_id,
-                token_id: token_id
-            } ) , 'tokens' );
+            // dojo.place( this.format_block( 'jstpl_token', {
+            //     color: this.gamedatas.players[ player_id ].color,
+            //     player_id: player_id,
+            //     token_id: token_id
+            // } ) , 'tokens' );
             
             var token_selector = 'token_'+player_id+'_'+token_id;
 
-            this.placeOnObject( token_selector, 'overall_player_board_'+player_id );
+            // this.placeOnObject( token_selector, 'overall_player_board_'+player_id );
             this.slideToObject( token_selector, 'circle_action_'+action_name ).play();
         },
-
-        moveTokenOnBoard: function( action_name, player_id, token_id )
-        {
-            console.log('in moveTokenOnBoard')
-
-            dojo.place( this.format_block( 'jstpl_token', {
-                color: this.gamedatas.players[ player_id ].color,
-                player_id: player_id,
-                token_id: token_id
-            } ) , 'tokens' );
-            
-            var token_selector = 'token_'+player_id+'_'+token_id;
-
-            this.placeOnObject( token_selector, 'overall_player_board_'+player_id );
-            this.slideToObject( token_selector, 'circle_action_'+action_name ).play();
-        },
-
 
         ///////////////////////////////////////////////////
         //// Player's action
