@@ -325,6 +325,15 @@ function (dojo, declare) {
             this.slideToObject( tile_selector, action_selector ).play();
         },
 
+        moveTileToPlayerTable: function( tile_id, player_id )
+        {
+            let tile_selector = 'tile_'+tile_id;
+            let playertable_selector = 'playertable_'+player_id;
+            // console.log('tile', tile_selector)
+            // console.log('table', playertable_selector)
+            // this.slideToObject( tile_selector, playertable_selector ).play();
+        },
+
         ///////////////////////////////////////////////////
         //// Player's action
         
@@ -488,6 +497,9 @@ function (dojo, declare) {
 
             dojo.subscribe( 'moveToken', this, "notif_moveToken" );
             this.notifqueue.setSynchronous( 'moveToken', 500 );
+
+            dojo.subscribe( 'giveTile', this, "notif_giveTile" );
+            this.notifqueue.setSynchronous( 'giveTile', 500 );
             
             // Example 1: standard notification handling
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
@@ -502,6 +514,13 @@ function (dojo, declare) {
         
         // TODO: from this point and below, you can write your game notifications handling methods
         
+        notif_giveTile: function( notif )
+        {
+            console.log('notif', notif)
+            // console.log( notif.args.tile_id, notif.args.opponent_id)
+            this.moveTileToPlayerTable( notif.args.tile_id, notif.args.opponent_id );
+        },
+
         notif_moveToken: function( notif )
         {
             // Remove current possible moves (makes the board more clear)
