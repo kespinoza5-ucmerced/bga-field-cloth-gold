@@ -31,7 +31,7 @@ This is your game interface. You can edit this HTML in your ".tpl" file.
 <div id="playertables">
 
     <!-- BEGIN player -->
-    <div class="playertable whiteblock playertable_{PLAYER_ID}">
+    <div id="playertable_{PLAYER_ID}" class="playertable whiteblock playertable_{PLAYER_ID}">
         <div class="playertablename" style="color:#{PLAYER_COLOR}">
             {PLAYER_NAME}
         </div>
