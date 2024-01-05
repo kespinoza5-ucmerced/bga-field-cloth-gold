@@ -190,7 +190,7 @@ class fieldofclothofgold extends Table
         $result['hand'] = $this->sack->getCardsInLocation( 'hand', $current_player_id );
 
         // Cards played on the table
-        $result['tilesontable'] = $this->sack->getCardsInLocation( 'tilesontable' );
+        $result['tableau'] = $this->sack->getCardsInLocation( 'tableau' );
   
         return $result;
     }
@@ -254,7 +254,7 @@ class fieldofclothofgold extends Table
 
         // move tile from 'board' location to opponent player hand location in db
         $opponent_id = self::getNextPlayerId();
-        $this->sack->moveCard( $tile['id'], 'hand', $opponent_id );
+        $this->sack->moveCard( $tile['id'], 'tableau', $opponent_id );
 
         // redraw tile, returns false if tile could not be drawn (no tiles left in sack)
         $action_id = array_search( $action, $this->actions );
