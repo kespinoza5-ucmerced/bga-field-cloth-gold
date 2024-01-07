@@ -62,9 +62,12 @@ This is your game interface. You can edit this HTML in your ".tpl" file.
     </div>
 
     <div id="tiles">
-        <!-- BEGIN square -->
-        <div id="square_{X}" class="square" style="left: {LEFT}px; top: {TOP}px;"></div>
-        <!-- END square -->
+        <div id="square_action_2" class="square" style="left: 141px; top: 197px;"></div>
+        <div id="square_action_3" class="square" style="left: 234px; top: 197px;"></div>
+        <div id="square_action_4" class="square" style="left: 329px; top: 197px;"></div>
+        <div id="square_action_5" class="square" style="left: 422px; top: 197px;"></div>
+        <div id="square_action_6" class="square" style="left: 516px; top: 197px;"></div>
+        <div id="square_action_7" class="square" style="left: 611px; top: 197px;"></div>
     </div>
 
     <div id="score_track">

@@ -300,25 +300,19 @@ function (dojo, declare) {
             this.slideToObject(token_selector, action_selector).play();
         },
 
-        // qwer
         addTileOnBoard: function( tile )
         {
             console.log('in addTileOnBoard')
 
-            console.log('tile', tile)
-            console.log('color', tile.type)
-            console.log('tile_id', tile.id)
-
-            dojo.place( this.format_block( 'jstpl_tile', {
+            dojo.place(this.format_block('jstpl_tile', {
                 color: tile.type,
                 tile_id: tile.id
-            } ) , 'tiles' );
+            }), 'tiles')
 
-            var action_selector = 'square_'+this.gamedatas.actions[tile.location_arg].name;
-            var tile_selector = 'tile_'+tile.id;
-            console.log('action',action_selector)
-            this.placeOnObject( tile_selector, action_selector );
-            this.slideToObject( tile_selector, action_selector ).play();
+            let action_selector = 'square_action_'+this.gamedatas.actions[tile.location_arg].id
+            let tile_selector = 'tile_'+tile.id
+            this.placeOnObject(tile_selector, action_selector)
+            this.slideToObject(tile_selector, action_selector).play()
         },
 
         moveTileToPlayerTable: function( tile_id, player_id )

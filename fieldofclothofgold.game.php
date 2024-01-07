@@ -211,16 +211,8 @@ class fieldofclothofgold extends Table
         In this space, you can put any utility methods useful for your game logic
     */
 
-    function getTileFromSpace( $action )
-    {
-        $action_square = null;
-        foreach ($this->actions as $action_id => $action_name) {
-            if ($action == $action_name['name']) {
-                $action_square = $action_id;
-            }
-        }
-        // $action_square = array_search( $action, $this->actions );
-        $tiles = $this->sack->getCardsInLocation( 'board', $action_square );
+    function getTileFromSpace($action_id) {
+        $tiles = $this->sack->getCardsInLocation('board', $action_id);
         return array_shift($tiles);
     }
 
@@ -236,45 +228,29 @@ class fieldofclothofgold extends Table
         }
     }
 
-    function giveTile( $action )
-    {
+    function giveTile($action_id) {
         // if token was placed on dragon space, no tile given
-        if ( 'dragon' == $action )
-        {
-            throw new BgaUserException(self::_("Not implemented: ") . "$action space does not hold a tile");
-        }
+        // TO BE REMOVED
+        if (7 == $action_id)
+            throw new BgaUserException(self::_("Not implemented: ") . "$action_id space does not hold a tile");
 
-        // query tile under action space
-        $tile = self::getTileFromSpace( $action );
+        $tile = self::getTileFromSpace($action_id);
 
-        // move tile from 'board' location to opponent player hand location in db
         $opponent_id = self::getNextPlayerId();
-        $this->sack->moveCard( $tile['id'], 'hand', $opponent_id );
+        $this->sack->moveCard($tile['id'], 'hand', $opponent_id);
 
-        // redraw tile, returns false if tile could not be drawn (no tiles left in sack)
-
-        $action_id = null;
-        foreach ($this->actions as $id => $name) {
-            if ($action == $name['name']) {
-                $action_id = $id;
-            }
-        }
-
-        // $action_id = array_search( $action, $this->actions );
-        if ( ! $this->sack->pickCardForLocation( 'deck', 'board', $action_id ) )
-        {
+        // early return if tile cant be redrawn
+        if (!$this->sack->pickCardForLocation( 'deck', 'board', $action_id))
             return false;
-        }
 
         // send notif to js
         $opponent_name = self::getPlayerNameById( $opponent_id );
-        self::notifyAllPlayers( "giveTile", clienttranslate( '${opponent_name} receives ${tile_color} tile' ), array(
+        self::notifyAllPlayers("giveTile", clienttranslate( '${opponent_name} receives ${tile_color} tile'), array(
             'opponent_name' => $opponent_name,
             'tile_color' => $tile['type'],
             'opponent_id' => $opponent_id,
             'tile_id' => $tile['id']
-        ) );
-
+        ));
     }
 
     function tokenSelectionIsValid( $player, $token, $tokens ) {
@@ -431,7 +407,7 @@ class fieldofclothofgold extends Table
         $sql = "UPDATE token SET token_selected=0 WHERE token_id=".$selected_token." AND token_player='".$player_id."'";
         self::DbQuery( $sql );
 
-        // self::giveTile( $action );
+        self::giveTile($action_id);
 
         // Statistics
 
