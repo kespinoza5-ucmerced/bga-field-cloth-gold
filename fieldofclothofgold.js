@@ -114,23 +114,18 @@ function (dojo, declare) {
                         token_id: token.id
                     } ) , 'tokens' );
 
-                    let token_selector = 'token_'+player+'_'+token.id;
-                    this.placeOnObject( token_selector, 'overall_player_board_'+player );
+                    let token_selector = 'token_'+player+'_'+token.id
+                    let board_selector = 'overall_player_board_'+player
+                    this.placeOnObject(token_selector, board_selector);
                 }
             }
 
-            for ( var [space, arg] of Object.entries(this.gamedatas.board) )
-            {
-                if ( arg.player != null ) {
-                    // function( action_name, player_id, token_id )
-                    this.addTokenOnBoard(space, arg.player, arg.token);
-                }
-            }
+            for (let action of Object.values(this.gamedatas.board))
+                if (action.player != null)
+                    this.addTokenOnBoard(action.id, action.player, action.token)
 
-            for ( let [id, tile] of Object.entries(this.gamedatas.tilesonboard) )
-            {
-                this.addTileOnBoard( tile );
-            }
+            for (let [id, tile] of Object.entries(this.gamedatas.tilesonboard))
+                this.addTileOnBoard( tile )
             // asdf
 
             // dojo.query( 'tokens' ).connect( 'onclick', this, 'onMoveToken' );
@@ -150,7 +145,7 @@ function (dojo, declare) {
 
             // }, true);
 
-            console.log( "Ending game setup" );
+            console.log( "Ending game setup" ); 
         },
        
 
@@ -288,7 +283,7 @@ function (dojo, declare) {
             }
         },
 
-        addTokenOnBoard: function( action_name, player_id, token_id )
+        addTokenOnBoard: function( action_id, player_id, token_id )
         {
             console.log('in addTokenOnBoard')
 
@@ -298,10 +293,11 @@ function (dojo, declare) {
             //     token_id: token_id
             // } ) , 'tokens' );
             
-            var token_selector = 'token_'+player_id+'_'+token_id;
+            let token_selector = 'token_'+player_id+'_'+token_id
+            let action_selector = 'circle_action_'+action_id
 
             // this.placeOnObject( token_selector, 'overall_player_board_'+player_id );
-            this.slideToObject( token_selector, 'circle_action_'+action_name ).play();
+            this.slideToObject(token_selector, action_selector).play();
         },
 
         // qwer
@@ -318,7 +314,7 @@ function (dojo, declare) {
                 tile_id: tile.id
             } ) , 'tiles' );
 
-            var action_selector = 'square_'+this.gamedatas.actions[tile.location_arg];
+            var action_selector = 'square_'+this.gamedatas.actions[tile.location_arg].name;
             var tile_selector = 'tile_'+tile.id;
             console.log('action',action_selector)
             this.placeOnObject( tile_selector, action_selector );
@@ -523,6 +519,7 @@ function (dojo, declare) {
 
         notif_moveToken: function( notif )
         {
+            console.log('entering notif_moveToken')
             // Remove current possible moves (makes the board more clear)
             dojo.query( '.possibleMove' ).removeClass( 'possibleMove' );
 

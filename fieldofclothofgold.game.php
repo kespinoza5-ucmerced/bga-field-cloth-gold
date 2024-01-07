@@ -85,11 +85,11 @@ class fieldofclothofgold extends Table
         $sql .= implode( ',', $values );
         self::DbQuery( $sql );
 
-        $sql = "INSERT INTO board (board_action) VALUES ";
+        $sql = "INSERT INTO board (board_id, board_action) VALUES ";
         $values = array();
         foreach( $this->actions as $action )
         {
-            $values[] = "('".$action."')";
+            $values[] = "(".$action['id'].",'".$action['name']."')";
         }
         $sql .= implode( ',', $values );
         self::DbQuery( $sql );
@@ -215,7 +215,7 @@ class fieldofclothofgold extends Table
     {
         $action_square = null;
         foreach ($this->actions as $action_id => $action_name) {
-            if ($action == $action_name) {
+            if ($action == $action_name['name']) {
                 $action_square = $action_id;
             }
         }
@@ -246,7 +246,6 @@ class fieldofclothofgold extends Table
 
         // query tile under action space
         $tile = self::getTileFromSpace( $action );
-        $this->debug("look here: " . json_encode($tile, JSON_PRETTY_PRINT) . " // ");
 
         // move tile from 'board' location to opponent player hand location in db
         $opponent_id = self::getNextPlayerId();
@@ -256,7 +255,7 @@ class fieldofclothofgold extends Table
 
         $action_id = null;
         foreach ($this->actions as $id => $name) {
-            if ($action == $name) {
+            if ($action == $name['name']) {
                 $action_id = $id;
             }
         }
@@ -292,20 +291,24 @@ class fieldofclothofgold extends Table
         return true;
     }   
 
-    function tokenPlacementIsValid( $action, $board ) {
-        if (! array_key_exists($action, $board)) {
+    function tokenPlacementIsValid( $action_id, $board ) {
+        if (! array_key_exists($action_id, $board)) {
             return false;
         }
 
         // check if space is free of player or dragon
-        $sql = "SELECT * FROM board 
-                WHERE board_action='".$action."' AND ".
-                    "board_player IS NULL";
-        $res = self::getCollectionFromDb( $sql );
-
-        if ( empty( $res ) ) {
-            throw new BgaUserException(self::_("Move not valid: ") . "$action space is occupied");
+        if ($board[$action_id]['player'] != null) {
+            return false;
         }
+
+        // $sql = "SELECT * FROM board 
+        //         WHERE board_action='".$action."' AND ".
+        //             "board_player IS NULL";
+        // $res = self::getCollectionFromDb( $sql );
+
+        // if ( empty( $res ) ) {
+        //     throw new BgaUserException(self::_("Move not valid: ") . "$action space is occupied");
+        // }
 
         return true;
     }
@@ -316,7 +319,7 @@ class fieldofclothofgold extends Table
     }
 
     function getBoard() {
-        $sql = "SELECT board_action id, board_token token, board_player player FROM board";
+        $sql = "SELECT board_id id, board_action name, board_token token, board_player player FROM board";
         return self::getCollectionFromDb( $sql );
     }
 
@@ -394,14 +397,14 @@ class fieldofclothofgold extends Table
         // throw new BgaUserException(self::_("Not implemented: ") . "token $player_id - $token_id placed");
     }
 
-    function placeToken($action) {
+    function placeToken($action_id) {
         self::checkAction("placeToken");
         $player_id = self::getActivePlayerId();
 
         $board = self::getBoard();
 
-        if ( ! self::tokenPlacementIsValid( $action, $board ) ) {
-            throw new BgaUserException(self::_("Move not valid: ") . "$player_id places at $action");
+        if ( ! self::tokenPlacementIsValid( $action_id, $board ) ) {
+            throw new BgaUserException(self::_("Move not valid: ") . "$player_id places at $action_id");
         }
 
         $sql = "SELECT token_player player, token_id id, token_location loc FROM token
@@ -415,27 +418,27 @@ class fieldofclothofgold extends Table
                     board_token=".$selected_token;
         self::DbQuery( $sql );
 
-        $sql = "UPDATE token SET token_location='".$action."'
+        $sql = "UPDATE token SET token_location='".$action_id."'
                 WHERE token_id=".$selected_token." AND
                     token_player='".$player_id."'";
         self::DbQuery( $sql );
 
         // move selected token
-        $sql = "UPDATE board SET board_player='".$player_id."', board_token=".$selected_token." WHERE board_action='".$action."'";
+        $sql = "UPDATE board SET board_player='".$player_id."', board_token=".$selected_token." WHERE board_id='".$action_id."'";
         self::DbQuery( $sql );
 
         // unselect token
         $sql = "UPDATE token SET token_selected=0 WHERE token_id=".$selected_token." AND token_player='".$player_id."'";
         self::DbQuery( $sql );
 
-        self::giveTile( $action );
+        // self::giveTile( $action );
 
         // Statistics
-        
+
         // Notify
         self::notifyAllPlayers( "moveToken", clienttranslate( '${player_name} moves token to ${action_name}' ), array(
             'player_name' => self::getActivePlayerName(),
-            'action_name' => $action,
+            'action_name' => $action_id,
             'player_id' => $player_id,
             'token_id' => $selected_token
         ) );

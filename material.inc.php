@@ -37,13 +37,13 @@ $this->card_types = array(
 // )
 
 $this->actions = array(
-    1 => "dragon",
-    2 => "secrecy",
-    3 => "gold",
-    4 => "blue",
-    5 => "white",
-    6 => "red",
-    7 => "purple"
+    1 => array("id" => 1, "name" => "dragon", "hasAttachedSquare" => false),
+    2 => array("id" => 2, "name" => "secrecy", "hasAttachedSquare" => true),
+    3 => array("id" => 3, "name" => "gold", "hasAttachedSquare" => true),
+    4 => array("id" => 4, "name" => "blue", "hasAttachedSquare" => true),
+    5 => array("id" => 5, "name" => "white", "hasAttachedSquare" => true),
+    6 => array("id" => 6, "name" => "red", "hasAttachedSquare" => true),
+    7 => array("id" => 7, "name" => "purple", "hasAttachedSquare" => true),
 );
 
 $this->colors = array(
