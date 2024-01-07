@@ -21,16 +21,6 @@ require_once( APP_GAMEMODULE_PATH.'module/table/table.game.php' );
 
 class fieldofclothofgold extends Table
 {
-    const ACTIONS = [
-        1 => "dragon",
-        2 => "secrecy",
-        3 => "gold",
-        4 => "blue",
-        5 => "white",
-        6 => "red",
-        7 => "purple"
-    ];
-
 	function __construct( )
 	{
         // Your global variables labels:
@@ -97,7 +87,7 @@ class fieldofclothofgold extends Table
 
         $sql = "INSERT INTO board (board_action) VALUES ";
         $values = array();
-        foreach( self::ACTIONS as $action )
+        foreach( $this->actions as $action )
         {
             $values[] = "('".$action."')";
         }
@@ -223,7 +213,13 @@ class fieldofclothofgold extends Table
 
     function getTileFromSpace( $action )
     {
-        $action_square = array_search( $action, $this->actions );
+        $action_square = null;
+        foreach ($this->actions as $action_id => $action_name) {
+            if ($action == $action_name) {
+                $action_square = $action_id;
+            }
+        }
+        // $action_square = array_search( $action, $this->actions );
         $tiles = $this->sack->getCardsInLocation( 'board', $action_square );
         return array_shift($tiles);
     }
@@ -257,7 +253,15 @@ class fieldofclothofgold extends Table
         $this->sack->moveCard( $tile['id'], 'hand', $opponent_id );
 
         // redraw tile, returns false if tile could not be drawn (no tiles left in sack)
-        $action_id = array_search( $action, $this->actions );
+
+        $action_id = null;
+        foreach ($this->actions as $id => $name) {
+            if ($action == $name) {
+                $action_id = $id;
+            }
+        }
+
+        // $action_id = array_search( $action, $this->actions );
         if ( ! $this->sack->pickCardForLocation( 'deck', 'board', $action_id ) )
         {
             return false;
