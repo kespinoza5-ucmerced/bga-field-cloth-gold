@@ -48,45 +48,23 @@ function (dojo, declare) {
             "gamedatas" argument contains all datas retrieved by your "getAllDatas" PHP method.
         */
         
-        setup: function( gamedatas )
-        {
-            console.log( "Starting game setup" );
-            console.log('here is gamedatas ',this.gamedatas)
-            
-            this.tableau = {};
+        setup: function( gamedatas ) {
+            console.log('Starting game setup')
+            console.log('here is gamedatas',this.gamedatas)
 
-            // Setting up player boards
-            for( var player_id in gamedatas.players )
-            {
-                var player = gamedatas.players[player_id];
+            this.playerHand = new ebg.stock()
+            this.initTileStock(this.playerHand, 'myhand')
 
-                // TODO: Setting up players boards if needed
-                this.tableau[player_id] = new ebg.stock();
-                this.tableau[player_id].create( this, $('playertabletile_'+player_id), this.cardwidth, this.cardheight );
-                // this.tableau[player_id].autowidth = true;
-
-                this.tableau[player_id].image_items_per_row = 5;
-                
-                for ( const color_id in this.gamedatas.tile_types ) {
-                    let sprite_position = color_id - 1;
-                    this.tableau[player_id].addItemType(color_id, color_id, g_gamethemeurl + 'img/tiles.png', sprite_position);
-                    this.tableau[player_id].autowidth = true;
-                }
+            this.tableau = {}
+            for (let player_id in gamedatas.players) {
+                this.tableau[player_id] = new ebg.stock()
+                this.initTileStock(this.tableau[player_id], 'playertabletile_'+player_id)
             }
-            
-            // TODO: Set up your game interface here, according to "gamedatas"
-            
-            // Player hand
-            this.playerHand = new ebg.stock(); // new stock object for hand
-            this.playerHand.create( this, $('myhand'), this.cardwidth, this.cardheight );
 
-            this.playerHand.image_items_per_row = 5;
-
-            // Create cards types:
-            for ( const color_id in this.gamedatas.tile_types ) {
-                let sprite_position = color_id - 1;
-                this.playerHand.addItemType(color_id, color_id, g_gamethemeurl + 'img/tiles.png', sprite_position);
-            }
+            // for (let action_id in gamedatas.actions) {
+            //     this.board.actions[action_id] = new ebg.stock()
+            //     this.initTileStock(this.board.actions[action_id], 'square_action_'+action_id)
+            // }
 
             // hook up player hand ??
             dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
@@ -237,6 +215,21 @@ function (dojo, declare) {
             script.
         
         */
+
+        initTileStock: function(stock_location, element_selector) {
+            stock_location.create(this, $(element_selector), this.cardwidth, this.cardheight)
+            // this.tableau[player_id].autowidth = true;
+            console.log('stock_l', stock_location)
+
+            stock_location.image_items_per_row = 5;
+
+            for ( const color_id in this.gamedatas.tile_types ) {
+                let sprite_position = color_id - 1;
+                stock_location.addItemType(color_id, color_id, g_gamethemeurl+'img/tiles.png', sprite_position);
+                // stock_location.autowidth = true;
+            }
+            console.log('complete tile stock')
+        },
 
         updatePossibleMoves: function( possibleMoves )
         {
