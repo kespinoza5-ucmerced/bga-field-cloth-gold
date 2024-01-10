@@ -33,6 +33,10 @@ function (dojo, declare) {
 
             this.cardwidth = 56;
             this.cardheight = 56;
+
+            this.playerHand = null
+            this.tableau = {}
+            this.board = {}
         },
         
         /*
@@ -55,10 +59,18 @@ function (dojo, declare) {
             this.playerHand = new ebg.stock()
             this.initTileStock(this.playerHand, 'myhand')
 
-            this.tableau = {}
-            for (let player_id in gamedatas.players) {
+            for (const player_id in gamedatas.players) {
                 this.tableau[player_id] = new ebg.stock()
                 this.initTileStock(this.tableau[player_id], 'playertabletile_'+player_id)
+            }
+
+            for (const action_id in gamedatas.actions)
+                this.board[action_id] = createAction(action_id, this)
+
+            for (const action_id in this.board) {
+                console.log('in loop',this.board[action_id])
+                if (this.board[action_id].hasAttachedSquare)
+                    this.board[action_id].placeTile(this)
             }
 
             // for (let action_id in gamedatas.actions) {
@@ -102,8 +114,8 @@ function (dojo, declare) {
                 if (action.player != null)
                     this.addTokenOnBoard(action.id, action.player, action.token)
 
-            for (let [id, tile] of Object.entries(this.gamedatas.tilesonboard))
-                this.addTileOnBoard( tile )
+            // for (let [id, tile] of Object.entries(this.gamedatas.tilesonboard))
+            //     this.addTileOnBoard( tile )
             // asdf
 
             // dojo.query( 'tokens' ).connect( 'onclick', this, 'onMoveToken' );
@@ -219,7 +231,6 @@ function (dojo, declare) {
         initTileStock: function(stock_location, element_selector) {
             stock_location.create(this, $(element_selector), this.cardwidth, this.cardheight)
             // this.tableau[player_id].autowidth = true;
-            console.log('stock_l', stock_location)
 
             stock_location.image_items_per_row = 5;
 
@@ -228,7 +239,6 @@ function (dojo, declare) {
                 stock_location.addItemType(color_id, color_id, g_gamethemeurl+'img/tiles.png', sprite_position);
                 // stock_location.autowidth = true;
             }
-            console.log('complete tile stock')
         },
 
         updatePossibleMoves: function( possibleMoves )

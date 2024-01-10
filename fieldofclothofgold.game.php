@@ -294,8 +294,12 @@ class fieldofclothofgold extends Table
         return self::getDoubleKeyCollectionFromDB( $sql );
     }
 
+    // currently kills the dragon space since it will never be matched with a card.
+    // will also kill spaces that currently dont have a tile...
     function getBoard() {
-        $sql = "SELECT board_id id, board_action name, board_token token, board_player player FROM board";
+        $sql = "SELECT board_id id, board_action name, board_token token, board_player player, card_id tile 
+                FROM board, card 
+                WHERE board_id=card_location_arg AND card_location='board'";
         return self::getCollectionFromDb( $sql );
     }
 
