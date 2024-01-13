@@ -245,7 +245,8 @@ class fieldofclothofgold extends Table
             'opponent_name' => $opponent_name,
             'tile_color' => $tile['type'],
             'opponent_id' => $opponent_id,
-            'tile_id' => $tile['id']
+            'tile_id' => $tile['id'],
+            'action_id' => $action_id
         ));
     }
 

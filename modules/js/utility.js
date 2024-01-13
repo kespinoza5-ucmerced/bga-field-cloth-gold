@@ -104,15 +104,15 @@ class SquareAction extends Action {
 
     placeTile(bga) {
         // what if tile not in gamedatas cuz notify?
-        console.log('inside place tile')
         let tile_id = bga.gamedatas.board[this.id].tile
-        console.log('tile_id', tile_id)
-        let tile = bga.gamedatas.tiles[tile_id]
-        console.log('tile', tile)
         let color_id = bga.gamedatas.tiles[tile_id].color_id
-        console.log('color_id', color_id)
         this.square.addToStockWithId(color_id, tile_id, 'topbar')
     }
-}
+
+    removeTile(bga) {
+        let tile_id = bga.gamedatas.board[this.id].tile
+        this.square.removeFromStockById(tile_id)
+    }
+ }
 
 module.exports = { getTileUniqueType }

@@ -71,13 +71,6 @@ function (dojo, declare) {
                 if (this.board[action_id].hasAttachedSquare)
                     this.board[action_id].placeTile(this)
             }
-            
-            console.log('finished loop')
-
-            // for (let action_id in gamedatas.actions) {
-            //     this.board.actions[action_id] = new ebg.stock()
-            //     this.initTileStock(this.board.actions[action_id], 'square_action_'+action_id)
-            // }
 
             // hook up player hand ??
             dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
@@ -91,7 +84,7 @@ function (dojo, declare) {
             console.log('added to stock player hand')
 
             // Cards played on table
-            for ( i in this.gamedatas.cardsontable ) {
+            for (i in this.gamedatas.cardsontable) {
                 let tile = this.gamedatas.tilesontable[i];
                 let player_id = card.location_arg;
                 this.playTileOnTable(player_id, tile.id, tile.stock_id);
@@ -510,11 +503,11 @@ function (dojo, declare) {
         
         // TODO: from this point and below, you can write your game notifications handling methods
         
-        notif_giveTile: function( notif )
-        {
+        notif_giveTile: function(notif) {
             console.log('notif', notif)
-            // console.log( notif.args.tile_id, notif.args.opponent_id)
-            this.moveTileToPlayerTable( notif.args.tile_id, notif.args.opponent_id );
+            // this.moveTileToPlayerTable(notif.args.tile_id, notif.args.opponent_id)
+            this.board[notif.args.action_id].removeTile(this)
+            console.log('should have removed tile?')
         },
 
         notif_moveToken: function( notif )
