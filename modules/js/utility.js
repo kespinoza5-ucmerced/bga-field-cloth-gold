@@ -58,7 +58,6 @@ function createAction(action_id, bga) {
 class Action {
     // action_id, action_square, this
     constructor (action) {
-        console.log('Action constructor', action)
         this.id = action.id
         this.name = action.name
         this.hasAttachedSquare = action.hasAttachedSquare
@@ -84,7 +83,6 @@ class Action {
 
 class DragonAction extends Action {
     constructor(action) {
-        console.log('constructing dragon')
         super(action)
     }
 
@@ -99,7 +97,6 @@ class DragonAction extends Action {
 
 class SquareAction extends Action {
     constructor(action, bga) {
-        console.log('constructing square')
         super(action)
         this.square = new ebg.stock()
         bga.initTileStock(this.square, 'square_action_'+action.id)
@@ -107,8 +104,13 @@ class SquareAction extends Action {
 
     placeTile(bga) {
         // what if tile not in gamedatas cuz notify?
+        console.log('inside place tile')
         let tile_id = bga.gamedatas.board[this.id].tile
-        let color_id = bga.gamedatas.tiles[tile_id-1].sprite_position + 1
+        console.log('tile_id', tile_id)
+        let tile = bga.gamedatas.tiles[tile_id]
+        console.log('tile', tile)
+        let color_id = bga.gamedatas.tiles[tile_id].color_id
+        console.log('color_id', color_id)
         this.square.addToStockWithId(color_id, tile_id, 'topbar')
     }
 }

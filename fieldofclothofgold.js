@@ -68,10 +68,11 @@ function (dojo, declare) {
                 this.board[action_id] = createAction(action_id, this)
 
             for (const action_id in this.board) {
-                console.log('in loop',this.board[action_id])
                 if (this.board[action_id].hasAttachedSquare)
                     this.board[action_id].placeTile(this)
             }
+            
+            console.log('finished loop')
 
             // for (let action_id in gamedatas.actions) {
             //     this.board.actions[action_id] = new ebg.stock()
@@ -82,10 +83,12 @@ function (dojo, declare) {
             dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
 
             // Cards in player's hand
-            for ( let i in this.gamedatas.hand ) {
-                let tile = this.gamedatas.hand[i];
-                this.playerHand.addToStockWithId(getTileUniqueType(tile.type), tile.id);
+            for (const i in this.gamedatas.hand) {
+                const tile = this.gamedatas.hand[i]
+                this.playerHand.addToStockWithId(tile.type_arg, tile.type)
             }
+
+            console.log('added to stock player hand')
 
             // Cards played on table
             for ( i in this.gamedatas.cardsontable ) {
@@ -234,9 +237,9 @@ function (dojo, declare) {
 
             stock_location.image_items_per_row = 5;
 
-            for ( const color_id in this.gamedatas.tile_types ) {
-                let sprite_position = color_id - 1;
-                stock_location.addItemType(color_id, color_id, g_gamethemeurl+'img/tiles.png', sprite_position);
+            for (const color_id in this.gamedatas.tile_types) {
+                const sprite_position = color_id;
+                stock_location.addItemType(color_id, color_id, g_gamethemeurl+'img/tiles.png', sprite_position)
                 // stock_location.autowidth = true;
             }
         },

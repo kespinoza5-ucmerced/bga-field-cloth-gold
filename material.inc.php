@@ -47,65 +47,70 @@ $this->actions = array(
 );
 
 $this->colors = array(
-  1 => array( 'name' => clienttranslate('blue'),
+  0 => array( 'name' => clienttranslate('blue'),
               'nametr' => self::_('blue') ),
-  2 => array( 'name' => clienttranslate('red'),
+  1 => array( 'name' => clienttranslate('red'),
               'nametr' => self::_('red') ),
-  3 => array( 'name' => clienttranslate('gold'),
+  2 => array( 'name' => clienttranslate('gold'),
               'nametr' => self::_('gold') ),
-  4 => array( 'name' => clienttranslate('white'),
+  3 => array( 'name' => clienttranslate('white'),
               'nametr' => self::_('white') ),
-  5 => array( 'name' => clienttranslate('green'),
+  4 => array( 'name' => clienttranslate('green'),
               'nametr' => self::_('green') )
 );
 
 $this->tiles = array();
 
-foreach (range(0,11) as $i) 
+foreach (range(1,12) as $i) 
 {
     $this->tiles[$i] = array( 
       // $this->colors[1] = blue tiles
-      'color' => $this->colors[1],
+      'color' => $this->colors[0],
+      'color_id' => 0,
       'id' => $i,
       'sprite_position' => 0
     );
 }
 
-foreach (range(12, 23) as $i) 
+foreach (range(13, 24) as $i) 
 {
     $this->tiles[$i] = array(       
       // $this->colors[2] = red tiles
-      'color' => $this->colors[2],
+      'color' => $this->colors[1],
+      'color_id' => 1,
       'id' => $i,
       'sprite_position' => 1
    );
 }
 
-foreach (range(24,35) as $i) 
+foreach (range(25,36) as $i) 
 {
     $this->tiles[$i] = array( 
       // $this->colors[3] = gold tiles
-      'color' => $this->colors[3],
+      'color' => $this->colors[2],
+      'color_id' => 2,
       'id' => $i,
       'sprite_position' => 2
      );
 }
 
-foreach (range(36,47) as $i) 
+foreach (range(37,48) as $i) 
 {
     $this->tiles[$i] = array( 
       // $this->colors[4] = white tiles
-      'color' => $this->colors[4],
+      'color' => $this->colors[3],
+      'color_id' => 3,
       'id' => $i,
       'sprite_position' => 3
     );
 }
 
-foreach (range(48,53) as $i) 
+foreach (range(49,54) as $i) 
 {
     $this->tiles[$i] = array(
       // $this->colors[5] = green tiles
-      'color' => $this->colors[5],
+      'color' => $this->colors[4],
+      'color_id' => 4,
       'id' => $i,
       'sprite_position' => 4
     );

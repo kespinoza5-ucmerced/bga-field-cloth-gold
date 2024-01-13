@@ -108,11 +108,8 @@ class fieldofclothofgold extends Table
 
         // Create tiles
         $tiles = array ();
-
-        foreach( $this->tiles as $tile )
-        {
-            $tiles [] = array ('type' => $tile['color']['name'],'type_arg' => 0,'nbr' => 1 );
-        }
+        foreach($this->tiles as $tile_id => $tile)
+            $tiles[] = array('type' => $tile_id, 'type_arg' => $tile['color_id'], 'nbr' => 1);
         
         $this->sack->createCards( $tiles, 'deck' );
 
@@ -123,7 +120,6 @@ class fieldofclothofgold extends Table
         foreach ( $players as $player_id => $player ) {
             $tiles = $this->sack->pickCards(2, 'deck', $player_id);
         }
-
 
         for ( $i=2 ; $i<=7 ; $i++ )
         {
