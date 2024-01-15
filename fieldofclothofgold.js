@@ -67,13 +67,12 @@ function (dojo, declare) {
             for (const action_id in gamedatas.actions)
                 this.board[action_id] = createAction(action_id, this)
 
-            for (const action_id in this.board) {
+            for (const action_id in this.board)
                 if (this.board[action_id].hasAttachedSquare)
                     this.board[action_id].placeTile(this)
-            }
 
             // hook up player hand ??
-            dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
+            // dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
 
             // Cards in player's hand
             for (const i in this.gamedatas.hand) {
@@ -81,34 +80,23 @@ function (dojo, declare) {
                 this.playerHand.addToStockWithId(tile.type_arg, tile.type)
             }
 
-            console.log('added to stock player hand')
+            // // Cards played on table
+            // for (i in this.gamedatas.cardsontable) {
+            //     let tile = this.gamedatas.tilesontable[i];
+            //     let player_id = card.location_arg;
+            //     this.playTileOnTable(player_id, tile.id, tile.stock_id);
+            // }
 
-            // Cards played on table
-            for (i in this.gamedatas.cardsontable) {
-                let tile = this.gamedatas.tilesontable[i];
-                let player_id = card.location_arg;
-                this.playTileOnTable(player_id, tile.id, tile.stock_id);
-            }
+            for (const player_id in this.gamedatas.tokens)
+                for (const token_id in this.gamedatas.tokens[player_id])
+                    this.placeTokenInSupply(this.gamedatas.tokens[player_id][token_id])
 
-            // place tokens in player supplies
-            for ( let [player, tokens] of Object.entries(this.gamedatas.tokens) )
-            {
-                for ( let token of Object.values(tokens) ) {
-                    dojo.place( this.format_block( 'jstpl_token', {
-                        color: this.gamedatas.players[ player ].color,
-                        player_id: player,
-                        token_id: token.id
-                    } ) , 'tokens' );
+            for (const action_id in this.board)
+                this.board[action_id].moveTokenToSpace(this)
 
-                    let token_selector = 'token_'+player+'_'+token.id
-                    let board_selector = 'overall_player_board_'+player
-                    this.placeOnObject(token_selector, board_selector);
-                }
-            }
-
-            for (let action of Object.values(this.gamedatas.board))
-                if (action.player != null)
-                    this.addTokenOnBoard(action.id, action.player, action.token)
+            // for (let action of Object.values(this.gamedatas.board))
+            //     if (action.player != null)
+            //         this.addTokenOnBoard(action.id, action.player, action.token)
 
             // for (let [id, tile] of Object.entries(this.gamedatas.tilesonboard))
             //     this.addTileOnBoard( tile )
@@ -226,6 +214,10 @@ function (dojo, declare) {
 
         initTileStock: function(stock_location, element_selector) {
             stock_location.create(this, $(element_selector), this.cardwidth, this.cardheight)
+
+            const UNSELECTABLE = 0
+            stock_location.setSelectionMode(UNSELECTABLE)
+
             // this.tableau[player_id].autowidth = true;
 
             stock_location.image_items_per_row = 5;
@@ -235,6 +227,18 @@ function (dojo, declare) {
                 stock_location.addItemType(color_id, color_id, g_gamethemeurl+'img/tiles.png', sprite_position)
                 // stock_location.autowidth = true;
             }
+        },
+
+        placeTokenInSupply: function(token) {
+            dojo.place(this.format_block('jstpl_token', {
+                color: this.gamedatas.players[token.player].color,
+                player_id: token.player,
+                token_id: token.id
+            }), 'tokens')
+
+            const token_selector = 'token_'+token.player+'_'+token.id
+            const board_selector = 'overall_player_board_'+token.player
+            this.placeOnObject(token_selector, board_selector)
         },
 
         updatePossibleMoves: function( possibleMoves )
@@ -510,13 +514,13 @@ function (dojo, declare) {
             console.log('should have removed tile?')
         },
 
-        notif_moveToken: function( notif )
-        {
+        notif_moveToken: function( notif ) {
             console.log('entering notif_moveToken')
-            // Remove current possible moves (makes the board more clear)
-            dojo.query( '.possibleMove' ).removeClass( 'possibleMove' );
 
-            this.addTokenOnBoard( notif.args.action_name, notif.args.player_id, notif.args.token_id );
+            dojo.query( '.possibleMove' ).removeClass( 'possibleMove' )
+
+            const token = { player: notif.args.player_id, id: notif.args.token_id }
+            this.board[notif.args.action_id].moveTokenToSpace(this, token)
         },
 
 

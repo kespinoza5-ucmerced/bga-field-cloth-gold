@@ -225,11 +225,6 @@ class fieldofclothofgold extends Table
     }
 
     function giveTile($action_id) {
-        // if token was placed on dragon space, no tile given
-        // TO BE REMOVED
-        if (7 == $action_id)
-            throw new BgaUserException(self::_("Not implemented: ") . "$action_id space does not hold a tile");
-
         $tile = self::getTileFromSpace($action_id);
 
         $opponent_id = self::getNextPlayerId();
@@ -294,10 +289,28 @@ class fieldofclothofgold extends Table
     // currently kills the dragon space since it will never be matched with a card.
     // will also kill spaces that currently dont have a tile...
     function getBoard() {
-        $sql = "SELECT board_id id, board_action name, board_token token, board_player player, card_id tile 
-                FROM board, card 
-                WHERE board_id=card_location_arg AND card_location='board'";
-        return self::getCollectionFromDb( $sql );
+        $sql = "SELECT board_id id, board_action name, board_token token, board_player player FROM board";
+        $board = self::getCollectionFromDb($sql);
+
+        $sql = "SELECT card_location_arg action_id, card_type tile_id, card_type_arg tile_color FROM card 
+                WHERE card_location='board'";
+        $tiles = self::getCollectionFromDb($sql);
+
+        for ($i=1; $i<=sizeof($board); $i++) {
+            if (! array_key_exists($board[$i]["id"], $tiles)) {
+                $board[$i]["tile"] = null;
+                $board[$i]["tile_color"] = null;
+                continue;
+            }
+
+            $tile = $tiles[$board[$i]["id"]];
+            $board[$i]["tile"] = $tile["tile_id"];
+            $board[$i]["tile_color"] = $tile["tile_color"];
+        }
+
+        $this->debug("look here: " . json_encode($board, JSON_PRETTY_PRINT) . " // ");
+
+        return $board;
     }
 
     function getPossibleSelects() {
@@ -408,14 +421,15 @@ class fieldofclothofgold extends Table
         $sql = "UPDATE token SET token_selected=0 WHERE token_id=".$selected_token." AND token_player='".$player_id."'";
         self::DbQuery( $sql );
 
-        self::giveTile($action_id);
+        if ($action_id != 1)
+            self::giveTile($action_id);
 
         // Statistics
 
         // Notify
-        self::notifyAllPlayers( "moveToken", clienttranslate( '${player_name} moves token to ${action_name}' ), array(
+        self::notifyAllPlayers( "moveToken", clienttranslate( '${player_name} moves token to ${action_id}' ), array(
             'player_name' => self::getActivePlayerName(),
-            'action_name' => $action_id,
+            'action_id' => $action_id,
             'player_id' => $player_id,
             'token_id' => $selected_token
         ) );
