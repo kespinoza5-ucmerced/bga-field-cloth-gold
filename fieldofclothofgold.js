@@ -71,21 +71,10 @@ function (dojo, declare) {
                 if (this.board[action_id].hasAttachedSquare)
                     this.board[action_id].placeTile(this)
 
-            // hook up player hand ??
-            // dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
-
-            // Cards in player's hand
             for (const i in this.gamedatas.hand) {
                 const tile = this.gamedatas.hand[i]
                 this.playerHand.addToStockWithId(tile.type_arg, tile.type)
             }
-
-            // // Cards played on table
-            // for (i in this.gamedatas.cardsontable) {
-            //     let tile = this.gamedatas.tilesontable[i];
-            //     let player_id = card.location_arg;
-            //     this.playTileOnTable(player_id, tile.id, tile.stock_id);
-            // }
 
             for (const player_id in this.gamedatas.tokens)
                 for (const token_id in this.gamedatas.tokens[player_id])
@@ -93,14 +82,6 @@ function (dojo, declare) {
 
             for (const action_id in this.board)
                 this.board[action_id].moveTokenToSpace(this)
-
-            // for (let action of Object.values(this.gamedatas.board))
-            //     if (action.player != null)
-            //         this.addTokenOnBoard(action.id, action.player, action.token)
-
-            // for (let [id, tile] of Object.entries(this.gamedatas.tilesonboard))
-            //     this.addTileOnBoard( tile )
-            // asdf
 
             // dojo.query( 'tokens' ).connect( 'onclick', this, 'onMoveToken' );
 
