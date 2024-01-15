@@ -231,9 +231,13 @@ class fieldofclothofgold extends Table
 
         $tile = $this->sack->pickCardForLocation('deck', 'board', $selected_token['loc']);
 
+        $this->debug("selected token does have old loc?: " . json_encode($selected_token, JSON_PRETTY_PRINT) . " // ");
+
         self::notifyAllPlayers("replenishTile", clienttranslate('New ${tile_color_name} tile draw to action space ${action_name}'), array(
+            'action_id' => $selected_token['loc'],
             'action_name' => $this->actions[$tile['location_arg']]['name'],
-            'tile' => $tile,
+            'tile_color' => $tile['type_arg'],
+            'tile_id' => $tile['type'],
             'tile_color_name' => $this->colors[$tile['type_arg']]['name']
         ));
     }
@@ -244,19 +248,17 @@ class fieldofclothofgold extends Table
         $opponent_id = self::getNextPlayerId();
         $this->sack->moveCard($tile['id'], 'tableau', $opponent_id);
 
-        // // early return if tile cant be redrawn
-        // if (!$this->sack->pickCardForLocation( 'deck', 'board', $action_id))
-        //     return false;
+        $this->debug("look here: " . json_encode($tile, JSON_PRETTY_PRINT) . " // ");
 
         // send notif to js
-        // $opponent_name = self::getPlayerNameById( $opponent_id );
-        // self::notifyAllPlayers("giveTile", clienttranslate( '${opponent_name} receives ${tile_color} tile'), array(
-        //     'opponent_name' => $opponent_name,
-        //     'tile_color' => $tile['type'],
-        //     'opponent_id' => $opponent_id,
-        //     'tile_id' => $tile['id'],
-        //     'action_id' => $action_id
-        // ));
+        $opponent_name = self::getPlayerNameById( $opponent_id );
+        self::notifyAllPlayers("giveTile", clienttranslate('${opponent_name} receives ${tile_color} tile'), array(
+            'opponent_name' => $opponent_name,
+            'tile_color' => $tile['type_arg'],
+            'opponent_id' => $opponent_id,
+            'tile_id' => $tile['type'],
+            'action_id' => $action_id
+        ));
     }
 
     function tokenSelectionIsValid( $player, $token, $tokens ) {

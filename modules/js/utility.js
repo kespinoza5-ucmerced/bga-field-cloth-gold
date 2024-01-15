@@ -27,14 +27,11 @@ class Action {
         return { player: action.player, id: action.token }
     }
 
-    moveTokenToSpace(bga, token = null) {
-        if (token == null)
-            token = this.getToken(bga)
-
-        if (token == false)
+    moveTokenToSpace(bga, token) {
+        if (token.id == null)
             return false
 
-        const dest_location_selector = 'circle_action_'+this.id
+        const dest_location_selector = 'circle_action_'+token.loc
         const token_selector = 'token_'+token.player+'_'+token.id
 
         bga.slideToObject(token_selector, dest_location_selector).play()
@@ -42,7 +39,7 @@ class Action {
 }
 
 class DragonAction extends Action {
-    constructor(action) {
+    constructor(action, bga) {
         super(action)
     }
 
@@ -58,19 +55,19 @@ class SquareAction extends Action {
         bga.initTileStock(this.square, 'square_action_'+action.id)
     }
 
-    placeTile(bga, tile=null) {
-        if (bga.gamedatas.board[this.id].tile == null)
+    placeTile(bga, tile) {
+        if (tile.id == null)
             return false
-        
-        let tile_id = bga.gamedatas.board[this.id].tile
-        let color_id = bga.gamedatas.tiles[tile_id].color_id
-        this.square.addToStockWithId(color_id, tile_id, 'topbar')
+
+        this.square.addToStockWithId(tile.color, tile.id, 'topbar')
     }
 
-    removeTile(bga) {
-        let tile_id = bga.gamedatas.board[this.id].tile
-        this.square.removeFromStockById(tile_id)
+    removeTile(bga, tile) {
+        if (tile.id == null)
+            return false
+
+        this.square.removeFromStockById(tile.id)
     }
- }
+}
 
 // module.exports = { }
