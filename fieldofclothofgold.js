@@ -33,6 +33,10 @@ function (dojo, declare) {
 
             this.cardwidth = 56;
             this.cardheight = 56;
+
+            this.playerHand = null
+            this.tableau = {}
+            this.board = {}
         },
         
         /*
@@ -48,89 +52,54 @@ function (dojo, declare) {
             "gamedatas" argument contains all datas retrieved by your "getAllDatas" PHP method.
         */
         
-        setup: function( gamedatas )
-        {
-            console.log( "Starting game setup" );
-            console.log('here is gamedatas ',this.gamedatas)
-            
-            this.tableau = {};
+        setup: function( gamedatas ) {
+            console.log('Starting game setup')
+            console.log('here is gamedatas',this.gamedatas)
 
-            // Setting up player boards
-            for( var player_id in gamedatas.players )
-            {
-                var player = gamedatas.players[player_id];
+            this.playerHand = new ebg.stock()
+            this.initTileStock(this.playerHand, 'myhand')
 
-                // TODO: Setting up players boards if needed
-                this.tableau[player_id] = new ebg.stock();
-                this.tableau[player_id].create( this, $('playertabletile_'+player_id), this.cardwidth, this.cardheight );
-                // this.tableau[player_id].autowidth = true;
-
-                this.tableau[player_id].image_items_per_row = 5;
-                
-                for ( const color_id in this.gamedatas.tile_types ) {
-                    let sprite_position = color_id - 1;
-                    this.tableau[player_id].addItemType(color_id, color_id, g_gamethemeurl + 'img/tiles.png', sprite_position);
-                    this.tableau[player_id].autowidth = true;
-                }
+            for (const player_id in gamedatas.players) {
+                this.tableau[player_id] = new ebg.stock()
+                this.initTileStock(this.tableau[player_id], 'playertabletile_'+player_id)
             }
-            
-            // TODO: Set up your game interface here, according to "gamedatas"
-            
-            // Player hand
-            this.playerHand = new ebg.stock(); // new stock object for hand
-            this.playerHand.create( this, $('myhand'), this.cardwidth, this.cardheight );
 
-            this.playerHand.image_items_per_row = 5;
+            for (const action_id in gamedatas.actions)
+                this.board[action_id] = createAction(action_id, this)
 
-            // Create cards types:
-            for ( const color_id in this.gamedatas.tile_types ) {
-                let sprite_position = color_id - 1;
-                this.playerHand.addItemType(color_id, color_id, g_gamethemeurl + 'img/tiles.png', sprite_position);
-            }
+            for (const action_id in this.board)
+                if (this.board[action_id].hasAttachedSquare)
+                    this.board[action_id].placeTile(this)
 
             // hook up player hand ??
-            dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
+            // dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
 
             // Cards in player's hand
-            for ( let i in this.gamedatas.hand ) {
-                let tile = this.gamedatas.hand[i];
-                this.playerHand.addToStockWithId(getTileUniqueType(tile.type), tile.id);
+            for (const i in this.gamedatas.hand) {
+                const tile = this.gamedatas.hand[i]
+                this.playerHand.addToStockWithId(tile.type_arg, tile.type)
             }
 
-            // Cards played on table
-            for ( i in this.gamedatas.cardsontable ) {
-                let tile = this.gamedatas.tilesontable[i];
-                let player_id = card.location_arg;
-                this.playTileOnTable(player_id, tile.id, tile.stock_id);
-            }
+            // // Cards played on table
+            // for (i in this.gamedatas.cardsontable) {
+            //     let tile = this.gamedatas.tilesontable[i];
+            //     let player_id = card.location_arg;
+            //     this.playTileOnTable(player_id, tile.id, tile.stock_id);
+            // }
 
-            // place tokens in player supplies
-            for ( let [player, tokens] of Object.entries(this.gamedatas.tokens) )
-            {
-                for ( let token of Object.values(tokens) ) {
-                    dojo.place( this.format_block( 'jstpl_token', {
-                        color: this.gamedatas.players[ player ].color,
-                        player_id: player,
-                        token_id: token.id
-                    } ) , 'tokens' );
+            for (const player_id in this.gamedatas.tokens)
+                for (const token_id in this.gamedatas.tokens[player_id])
+                    this.placeTokenInSupply(this.gamedatas.tokens[player_id][token_id])
 
-                    let token_selector = 'token_'+player+'_'+token.id;
-                    this.placeOnObject( token_selector, 'overall_player_board_'+player );
-                }
-            }
+            for (const action_id in this.board)
+                this.board[action_id].moveTokenToSpace(this)
 
-            for ( var [space, arg] of Object.entries(this.gamedatas.board) )
-            {
-                if ( arg.player != null ) {
-                    // function( action_name, player_id, token_id )
-                    this.addTokenOnBoard(space, arg.player, arg.token);
-                }
-            }
+            // for (let action of Object.values(this.gamedatas.board))
+            //     if (action.player != null)
+            //         this.addTokenOnBoard(action.id, action.player, action.token)
 
-            for ( let [id, tile] of Object.entries(this.gamedatas.tilesonboard) )
-            {
-                this.addTileOnBoard( tile );
-            }
+            // for (let [id, tile] of Object.entries(this.gamedatas.tilesonboard))
+            //     this.addTileOnBoard( tile )
             // asdf
 
             // dojo.query( 'tokens' ).connect( 'onclick', this, 'onMoveToken' );
@@ -150,7 +119,7 @@ function (dojo, declare) {
 
             // }, true);
 
-            console.log( "Ending game setup" );
+            console.log( "Ending game setup" ); 
         },
        
 
@@ -243,6 +212,35 @@ function (dojo, declare) {
         
         */
 
+        initTileStock: function(stock_location, element_selector) {
+            stock_location.create(this, $(element_selector), this.cardwidth, this.cardheight)
+
+            const UNSELECTABLE = 0
+            stock_location.setSelectionMode(UNSELECTABLE)
+
+            // this.tableau[player_id].autowidth = true;
+
+            stock_location.image_items_per_row = 5;
+
+            for (const color_id in this.gamedatas.tile_types) {
+                const sprite_position = color_id;
+                stock_location.addItemType(color_id, color_id, g_gamethemeurl+'img/tiles.png', sprite_position)
+                // stock_location.autowidth = true;
+            }
+        },
+
+        placeTokenInSupply: function(token) {
+            dojo.place(this.format_block('jstpl_token', {
+                color: this.gamedatas.players[token.player].color,
+                player_id: token.player,
+                token_id: token.id
+            }), 'tokens')
+
+            const token_selector = 'token_'+token.player+'_'+token.id
+            const board_selector = 'overall_player_board_'+token.player
+            this.placeOnObject(token_selector, board_selector)
+        },
+
         updatePossibleMoves: function( possibleMoves )
         {
             console.log('made it to updateMove')
@@ -288,7 +286,7 @@ function (dojo, declare) {
             }
         },
 
-        addTokenOnBoard: function( action_name, player_id, token_id )
+        addTokenOnBoard: function( action_id, player_id, token_id )
         {
             console.log('in addTokenOnBoard')
 
@@ -298,31 +296,26 @@ function (dojo, declare) {
             //     token_id: token_id
             // } ) , 'tokens' );
             
-            var token_selector = 'token_'+player_id+'_'+token_id;
+            let token_selector = 'token_'+player_id+'_'+token_id
+            let action_selector = 'circle_action_'+action_id
 
             // this.placeOnObject( token_selector, 'overall_player_board_'+player_id );
-            this.slideToObject( token_selector, 'circle_action_'+action_name ).play();
+            this.slideToObject(token_selector, action_selector).play();
         },
 
-        // qwer
         addTileOnBoard: function( tile )
         {
             console.log('in addTileOnBoard')
 
-            console.log('tile', tile)
-            console.log('color', tile.type)
-            console.log('tile_id', tile.id)
-
-            dojo.place( this.format_block( 'jstpl_tile', {
+            dojo.place(this.format_block('jstpl_tile', {
                 color: tile.type,
                 tile_id: tile.id
-            } ) , 'tiles' );
+            }), 'tiles')
 
-            var action_selector = 'square_'+this.gamedatas.actions[tile.location_arg];
-            var tile_selector = 'tile_'+tile.id;
-            console.log('action',action_selector)
-            this.placeOnObject( tile_selector, action_selector );
-            this.slideToObject( tile_selector, action_selector ).play();
+            let action_selector = 'square_action_'+this.gamedatas.actions[tile.location_arg].id
+            let tile_selector = 'tile_'+tile.id
+            this.placeOnObject(tile_selector, action_selector)
+            this.slideToObject(tile_selector, action_selector).play()
         },
 
         moveTileToPlayerTable: function( tile_id, player_id )
@@ -514,19 +507,20 @@ function (dojo, declare) {
         
         // TODO: from this point and below, you can write your game notifications handling methods
         
-        notif_giveTile: function( notif )
-        {
+        notif_giveTile: function(notif) {
             console.log('notif', notif)
-            // console.log( notif.args.tile_id, notif.args.opponent_id)
-            this.moveTileToPlayerTable( notif.args.tile_id, notif.args.opponent_id );
+            // this.moveTileToPlayerTable(notif.args.tile_id, notif.args.opponent_id)
+            this.board[notif.args.action_id].removeTile(this)
+            console.log('should have removed tile?')
         },
 
-        notif_moveToken: function( notif )
-        {
-            // Remove current possible moves (makes the board more clear)
-            dojo.query( '.possibleMove' ).removeClass( 'possibleMove' );
+        notif_moveToken: function( notif ) {
+            console.log('entering notif_moveToken')
 
-            this.addTokenOnBoard( notif.args.action_name, notif.args.player_id, notif.args.token_id );
+            dojo.query( '.possibleMove' ).removeClass( 'possibleMove' )
+
+            const token = { player: notif.args.player_id, id: notif.args.token_id }
+            this.board[notif.args.action_id].moveTokenToSpace(this, token)
         },
 
 

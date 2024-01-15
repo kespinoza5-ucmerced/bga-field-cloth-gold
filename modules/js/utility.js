@@ -1,45 +1,74 @@
-function getTileUniqueType(color) {
-    if (color == 'blue') {
-        return 1;
-    } else if (color == 'red') {
-        return 2;
-    } else if (color == 'gold') {
-        return 3;
-    } else if (color == 'white') {
-        return 4;
-    } else if (color == 'green') {
-        return 5;
-    }
+function createAction(action_id, bga) {
+    const DRAGON = 1
+    const action = bga.gamedatas.actions[action_id]
 
-    // means error
-    return -1;
+    if (action_id == DRAGON)
+        return new DragonAction(action, bga)
+    
+    if (action_id in bga.gamedatas.actions)
+        return new SquareAction(action, bga)
+
+    return null
 }
 
-function getTileTypeFromId( tile_id ) {
-    // blue
-    if (tile_id >=0 && tile_id <= 11) {
-        return 1
+class Action {
+    constructor (action) {
+        this.id = action.id
+        this.name = action.name
+        this.hasAttachedSquare = action.hasAttachedSquare
     }
 
-    // red
-    if (tile_id >= 12 && tile_id <= 23) {
-        return 2
+    getToken(bga) {
+        const action = bga.gamedatas.board[this.id]
+
+        if (action.token == null)
+            return false
+
+        return { player: action.player, id: action.token }
     }
 
-    // gold
-    if (tile_id >= 24 && tile_id <= 35) {
-        return 3
-    }
+    moveTokenToSpace(bga, token = null) {
+        if (token == null)
+            token = this.getToken(bga)
 
-    // white
-    if (tile_id >= 36 && tile_id <= 47) {
-        return 4
-    }
+        if (token == false)
+            return false
 
-    // green
-    if (tile_id >= 48 && tile_id <= 53) {
-        return 5
+        const dest_location_selector = 'circle_action_'+this.id
+        const token_selector = 'token_'+token.player+'_'+token.id
+
+        bga.slideToObject(token_selector, dest_location_selector).play()
     }
 }
 
-module.exports = { getTileUniqueType }
+class DragonAction extends Action {
+    constructor(action) {
+        super(action)
+    }
+
+    replaceDragon() {
+
+    }
+}
+
+class SquareAction extends Action {
+    constructor(action, bga) {
+        super(action)
+        this.square = new ebg.stock()
+        bga.initTileStock(this.square, 'square_action_'+action.id)
+    }
+
+    placeTile(bga) {
+        // what if tile not in gamedatas cuz notify?
+        let tile_id = bga.gamedatas.board[this.id].tile
+        let color_id = bga.gamedatas.tiles[tile_id].color_id
+        this.square.addToStockWithId(color_id, tile_id, 'topbar')
+    }
+
+    removeTile(bga) {
+        let tile_id = bga.gamedatas.board[this.id].tile
+        this.square.removeFromStockById(tile_id)
+    }
+ }
+
+// module.exports = { }

@@ -51,31 +51,8 @@ class view_fieldofclothofgold_fieldofclothofgold extends game_view
                     "PLAYER_COLOR" => $players [$player_id] ['player_color']));
         }
 
-        // this will make our My Hand text translatable
+        // this will make our My Hand text translatable 
         $this->tpl['MY_HAND'] = self::_("My hand");
-
-        $this->page->begin_block( $template, "square" );
-
-        $actions = [
-            1 => "dragon",
-            2 => "secrecy",
-            3 => "gold",
-            4 => "blue",
-            5 => "white",
-            6 => "red",
-            7 => "purple"
-        ];
-    
-
-        $hor_scale = 94;
-        for ( $x=0; $x<6; $x++ )
-        {
-            $this->page->insert_block( "square", array(
-                'X' => $actions[$x+2],
-                'LEFT' => round( ($x)*$hor_scale+141 ),
-                'TOP' => 197
-            ));
-        }
 
         /*
         
