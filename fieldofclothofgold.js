@@ -488,11 +488,14 @@ function (dojo, declare) {
             
             // TODO: here, associate your game notifications with local methods
 
-            dojo.subscribe( 'moveToken', this, "notif_moveToken" );
-            this.notifqueue.setSynchronous( 'moveToken', 500 );
+            dojo.subscribe('moveToken', this, "notif_moveToken")
+            this.notifqueue.setSynchronous('moveToken', 500)
 
-            dojo.subscribe( 'giveTile', this, "notif_giveTile" );
-            this.notifqueue.setSynchronous( 'giveTile', 500 );
+            dojo.subscribe('giveTile', this, "notif_giveTile")
+            this.notifqueue.setSynchronous('giveTile', 500)
+
+            dojo.subscribe('replenishTile', this, "notif_replenishTile")
+            this.notifqueue.setSynchronous('replenishTile', 500)
             
             // Example 1: standard notification handling
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
@@ -503,7 +506,7 @@ function (dojo, declare) {
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
             // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
             // 
-        },  
+        },
         
         // TODO: from this point and below, you can write your game notifications handling methods
         
@@ -523,6 +526,16 @@ function (dojo, declare) {
             this.board[notif.args.action_id].moveTokenToSpace(this, token)
         },
 
+        notif_replenishTile: function(notif) {
+            console.log('entering notif_replenishTile')
+            console.log(notif.args)
+
+            // lets see if gamedatas has updated... 
+            console.log('here is gamedatas again...',this.gamedatas)
+
+            // const token = { player: notif.args.player_id, id: notif.args.token_id }
+            // this.board[notif.args.action_id].placeTile(this, token)
+        }
 
         /*
         Example:

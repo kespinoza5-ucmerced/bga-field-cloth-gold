@@ -58,7 +58,7 @@ class SquareAction extends Action {
         bga.initTileStock(this.square, 'square_action_'+action.id)
     }
 
-    placeTile(bga) {
+    placeTile(bga, tile=null) {
         if (bga.gamedatas.board[this.id].tile == null)
             return false
         
