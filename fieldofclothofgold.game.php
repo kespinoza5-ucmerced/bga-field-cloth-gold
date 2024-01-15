@@ -230,9 +230,9 @@ class fieldofclothofgold extends Table
         $opponent_id = self::getNextPlayerId();
         $this->sack->moveCard($tile['id'], 'hand', $opponent_id);
 
-        // early return if tile cant be redrawn
-        if (!$this->sack->pickCardForLocation( 'deck', 'board', $action_id))
-            return false;
+        // // early return if tile cant be redrawn
+        // if (!$this->sack->pickCardForLocation( 'deck', 'board', $action_id))
+        //     return false;
 
         // send notif to js
         $opponent_name = self::getPlayerNameById( $opponent_id );

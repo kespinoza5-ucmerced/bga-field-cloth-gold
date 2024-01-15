@@ -59,7 +59,9 @@ class SquareAction extends Action {
     }
 
     placeTile(bga) {
-        // what if tile not in gamedatas cuz notify?
+        if (bga.gamedatas.board[this.id].tile == null)
+            return false
+        
         let tile_id = bga.gamedatas.board[this.id].tile
         let color_id = bga.gamedatas.tiles[tile_id].color_id
         this.square.addToStockWithId(color_id, tile_id, 'topbar')
