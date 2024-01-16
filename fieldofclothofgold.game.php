@@ -229,6 +229,11 @@ class fieldofclothofgold extends Table
             return false;
         }
 
+        $DRAGON = 1;
+        if ($selected_token["loc"] == $DRAGON) {
+            return false;
+        }
+
         $tile = $this->sack->pickCardForLocation('deck', 'board', $selected_token['loc']);
 
         $this->debug("selected token does have old loc?: " . json_encode($selected_token, JSON_PRETTY_PRINT) . " // ");
