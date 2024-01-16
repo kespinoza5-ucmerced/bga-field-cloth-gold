@@ -67,12 +67,12 @@ function (dojo, declare) {
             for (const action_id in gamedatas.actions)
                 this.board[action_id] = createAction(action_id, this)
 
-            for (const action_id in this.board)
-                if (this.board[action_id].hasAttachedSquare)
-                    this.board[action_id].placeTile(this)
-
-            // hook up player hand ??
-            // dojo.connect( this.playerHand, 'onChangeSelection', this, 'onPlayerHandSelectionChanged' );
+            for (const action_id in this.board) {
+                if (this.board[action_id].hasAttachedSquare) {
+                    const tile = { color: gamedatas.board[action_id].tile_color, id: gamedatas.board[action_id].tile }
+                    this.board[action_id].placeTile(this, tile)
+                }
+            }
 
             // Cards in player's hand
             for (const i in this.gamedatas.hand) {
@@ -91,8 +91,11 @@ function (dojo, declare) {
                 for (const token_id in this.gamedatas.tokens[player_id])
                     this.placeTokenInSupply(this.gamedatas.tokens[player_id][token_id])
 
-            for (const action_id in this.board)
-                this.board[action_id].moveTokenToSpace(this)
+            for (const action_id in gamedatas.board) {
+                const action_space = gamedatas.board[action_id]
+                const token = { id: action_space.token, player: action_space.player, loc: action_id }
+                this.board[action_id].moveTokenToSpace(this, token)
+            }
 
             // for (let action of Object.values(this.gamedatas.board))
             //     if (action.player != null)
@@ -399,41 +402,7 @@ function (dojo, declare) {
                 }, function(is_error) {
                 });
             }
-        },
-
-        onPlayerHandSelectionChanged: function() {
-            var items = this.playerHand.getSelectedItems();
-
-            if (items.length > 0) {
-                var action = 'dragonSelected';
-                if (this.checkAction(action, true)) {
-                    // Can play a card
-
-                    var tile_id = items[0].id;
-                    console.log("on "+action+" " +tile_id);
-
-                    // type is color
-                    var tile_type = items[0].type;
-                    this.ajaxcall("/" + this.game_name + "/" + this.game_name + "/" + action + ".html", {
-                        id : tile_id,
-                        lock : true
-                    }, this, function(result) {
-                    }, function(is_error) {
-                    });
-                    
-                    // this.playTileOnTable(this.player_id, tile_type, tile_id);
-
-                    this.playerHand.unselectAll();
-                } else if (this.checkAction('giveCards')) {
-                    // Can give cards => let the player select some cards
-                } else {
-                    this.playerHand.unselectAll();
-                }
-            }
-
-            this.playerHand.updateDisplay();
-        },
-    
+        },    
         
         /* Example:
         
@@ -484,15 +453,16 @@ function (dojo, declare) {
         */
         setupNotifications: function()
         {
-            console.log( 'notifications subscriptions setup' );
-            
-            // TODO: here, associate your game notifications with local methods
+            console.log('notifications subscriptions setup')
 
-            dojo.subscribe( 'moveToken', this, "notif_moveToken" );
-            this.notifqueue.setSynchronous( 'moveToken', 500 );
+            dojo.subscribe('moveToken', this, "notif_moveToken")
+            this.notifqueue.setSynchronous('moveToken', 500)
 
-            dojo.subscribe( 'giveTile', this, "notif_giveTile" );
-            this.notifqueue.setSynchronous( 'giveTile', 500 );
+            dojo.subscribe('giveTile', this, "notif_giveTile")
+            this.notifqueue.setSynchronous('giveTile', 500)
+
+            dojo.subscribe('replenishTile', this, "notif_replenishTile")
+            this.notifqueue.setSynchronous('replenishTile', 500)
             
             // Example 1: standard notification handling
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
@@ -503,15 +473,13 @@ function (dojo, declare) {
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
             // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
             // 
-        },  
-        
-        // TODO: from this point and below, you can write your game notifications handling methods
+        },
         
         notif_giveTile: function(notif) {
-            console.log('notif', notif)
-            // this.moveTileToPlayerTable(notif.args.tile_id, notif.args.opponent_id)
-            this.board[notif.args.action_id].removeTile(this)
-            console.log('should have removed tile?')
+            console.log('entering notif_giveTile')
+
+            const tile = { color: notif.args.tile_color, id: notif.args.tile_id }
+            this.board[notif.args.action_id].removeTile(this, tile)
         },
 
         notif_moveToken: function( notif ) {
@@ -519,24 +487,15 @@ function (dojo, declare) {
 
             dojo.query( '.possibleMove' ).removeClass( 'possibleMove' )
 
-            const token = { player: notif.args.player_id, id: notif.args.token_id }
+            const token = { id: notif.args.token_id, player: notif.args.player_id, loc: notif.args.action_id }
             this.board[notif.args.action_id].moveTokenToSpace(this, token)
         },
 
+        notif_replenishTile: function(notif) {
+            console.log('entering notif_replenishTile')
 
-        /*
-        Example:
-        
-        notif_cardPlayed: function( notif )
-        {
-            console.log( 'notif_cardPlayed' );
-            console.log( notif );
-            
-            // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
-            
-            // TODO: play the card in the user interface.
-        },    
-        
-        */
+            const tile = { color: notif.args.tile_color, id: notif.args.tile_id }
+            this.board[notif.args.action_id].placeTile(this, tile)
+        }
    });             
 });

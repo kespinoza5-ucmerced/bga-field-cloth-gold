@@ -176,7 +176,7 @@ class fieldofclothofgold extends Table
         $result['hand'] = $this->sack->getCardsInLocation( 'hand', $current_player_id );
 
         // Cards played on the table
-        $result['tilesontable'] = $this->sack->getCardsInLocation( 'tilesontable' );
+        $result['tableau'] = $this->sack->getCardsInLocation( 'tableau' );
   
         return $result;
     }
@@ -224,23 +224,44 @@ class fieldofclothofgold extends Table
         }
     }
 
+    function replenishTile($selected_token) {
+        if ($selected_token["loc"] == 'supply') {
+            return false;
+        }
+
+        $DRAGON = 1;
+        if ($selected_token["loc"] == $DRAGON) {
+            return false;
+        }
+
+        $tile = $this->sack->pickCardForLocation('deck', 'board', $selected_token['loc']);
+
+        $this->debug("selected token does have old loc?: " . json_encode($selected_token, JSON_PRETTY_PRINT) . " // ");
+
+        self::notifyAllPlayers("replenishTile", clienttranslate('New ${tile_color_name} tile draw to action space ${action_name}'), array(
+            'action_id' => $selected_token['loc'],
+            'action_name' => $this->actions[$tile['location_arg']]['name'],
+            'tile_color' => $tile['type_arg'],
+            'tile_id' => $tile['type'],
+            'tile_color_name' => $this->colors[$tile['type_arg']]['name']
+        ));
+    }
+
     function giveTile($action_id) {
         $tile = self::getTileFromSpace($action_id);
 
         $opponent_id = self::getNextPlayerId();
-        $this->sack->moveCard($tile['id'], 'hand', $opponent_id);
+        $this->sack->moveCard($tile['id'], 'tableau', $opponent_id);
 
-        // early return if tile cant be redrawn
-        if (!$this->sack->pickCardForLocation( 'deck', 'board', $action_id))
-            return false;
+        $this->debug("look here: " . json_encode($tile, JSON_PRETTY_PRINT) . " // ");
 
         // send notif to js
         $opponent_name = self::getPlayerNameById( $opponent_id );
-        self::notifyAllPlayers("giveTile", clienttranslate( '${opponent_name} receives ${tile_color} tile'), array(
+        self::notifyAllPlayers("giveTile", clienttranslate('${opponent_name} receives ${tile_color} tile'), array(
             'opponent_name' => $opponent_name,
-            'tile_color' => $tile['type'],
+            'tile_color' => $tile['type_arg'],
             'opponent_id' => $opponent_id,
-            'tile_id' => $tile['id'],
+            'tile_id' => $tile['type'],
             'action_id' => $action_id
         ));
     }
@@ -307,8 +328,6 @@ class fieldofclothofgold extends Table
             $board[$i]["tile"] = $tile["tile_id"];
             $board[$i]["tile_color"] = $tile["tile_color"];
         }
-
-        $this->debug("look here: " . json_encode($board, JSON_PRETTY_PRINT) . " // ");
 
         return $board;
     }
@@ -393,36 +412,38 @@ class fieldofclothofgold extends Table
 
         $board = self::getBoard();
 
-        if ( ! self::tokenPlacementIsValid( $action_id, $board ) ) {
+        if (! self::tokenPlacementIsValid($action_id, $board)) {
             throw new BgaUserException(self::_("Move not valid: ") . "$player_id places at $action_id");
         }
 
         $sql = "SELECT token_player player, token_id id, token_location loc FROM token
-                WHERE token_player='".$player_id."' AND
-                    token_selected=1";
-        $selected_token = self::getCollectionFromDb( $sql )[$player_id]['id'];
+                WHERE token_player='".$player_id."' AND token_selected=1";
+        $selected_token = self::getObjectFromDB($sql);
+        $selected_token_id = $selected_token['id'];
 
         // remove old token
         $sql = "UPDATE board SET board_player=NULL, board_token=NULL 
-                WHERE board_player='".$player_id."' AND
-                    board_token=".$selected_token;
+                WHERE board_player='".$player_id."' AND board_token=".$selected_token_id;
         self::DbQuery( $sql );
 
         $sql = "UPDATE token SET token_location='".$action_id."'
-                WHERE token_id=".$selected_token." AND
+                WHERE token_id=".$selected_token_id." AND
                     token_player='".$player_id."'";
         self::DbQuery( $sql );
 
         // move selected token
-        $sql = "UPDATE board SET board_player='".$player_id."', board_token=".$selected_token." WHERE board_id='".$action_id."'";
+        $sql = "UPDATE board SET board_player='".$player_id."', board_token=".$selected_token_id." WHERE board_id='".$action_id."'";
         self::DbQuery( $sql );
 
         // unselect token
-        $sql = "UPDATE token SET token_selected=0 WHERE token_id=".$selected_token." AND token_player='".$player_id."'";
+        $sql = "UPDATE token SET token_selected=0 WHERE token_id=".$selected_token_id." AND token_player='".$player_id."'";
         self::DbQuery( $sql );
 
         if ($action_id != 1)
             self::giveTile($action_id);
+
+        // draw new tile to recently evacuated space
+        self::replenishTile($selected_token);
 
         // Statistics
 
@@ -431,7 +452,7 @@ class fieldofclothofgold extends Table
             'player_name' => self::getActivePlayerName(),
             'action_id' => $action_id,
             'player_id' => $player_id,
-            'token_id' => $selected_token
+            'token_id' => $selected_token_id
         ) );
         
         // tokens left in player supply
