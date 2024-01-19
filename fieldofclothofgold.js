@@ -59,10 +59,8 @@ function (dojo, declare) {
             this.playerHand = new ebg.stock()
             this.initTileStock(this.playerHand, 'myhand')
 
-            for (const player_id in gamedatas.players) {
-                this.tableau[player_id] = new ebg.stock()
-                this.initTileStock(this.tableau[player_id], 'playertabletile_'+player_id)
-            }
+            for (const player_id in gamedatas.players)
+                this.tableau[player_id] = new Tableau(this, player_id)
 
             for (const action_id in gamedatas.actions)
                 this.board[action_id] = createAction(action_id, this)
@@ -74,10 +72,15 @@ function (dojo, declare) {
                 }
             }
 
-            // Cards in player's hand
             for (const i in this.gamedatas.hand) {
                 const tile = this.gamedatas.hand[i]
                 this.playerHand.addToStockWithId(tile.type_arg, tile.type)
+            }
+
+            for (const tile_id in gamedatas.tableau) {
+                const player_id = gamedatas.tableau[tile_id].location_arg
+                const tile = { color: gamedatas.tableau[tile_id].type_arg, id: gamedatas.tableau[tile_id].type }
+                this.tableau[player_id].takeTileFromOffboard(this, tile)
             }
 
             // // Cards played on table
@@ -220,6 +223,7 @@ function (dojo, declare) {
 
             const UNSELECTABLE = 0
             stock_location.setSelectionMode(UNSELECTABLE)
+            stock_location.extraClasses = 'top'
 
             // this.tableau[player_id].autowidth = true;
 
@@ -480,6 +484,7 @@ function (dojo, declare) {
 
             const tile = { color: notif.args.tile_color, id: notif.args.tile_id }
             this.board[notif.args.action_id].removeTile(this, tile)
+            this.tableau[notif.args.opponent_id].takeTileFromAction(this, tile, notif.args.action_id)    
         },
 
         notif_moveToken: function( notif ) {

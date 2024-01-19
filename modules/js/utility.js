@@ -70,4 +70,22 @@ class SquareAction extends Action {
     }
 }
 
+class Tableau {
+    constructor(bga, player_id) {
+        this.player_id = player_id
+        this.tableau = new ebg.stock()
+        bga.initTileStock(this.tableau, 'playertabletile_'+player_id)
+    }
+
+    takeTileFromOffboard(bga, tile) {
+        this.tableau.addToStockWithId(tile.color, tile.id, 'topbar')
+    }
+
+    takeTileFromAction(bga, tile, action_id) {
+        const action_square_selector = 'square_action_'+action_id
+        this.tableau.addToStockWithId(tile.color, tile.id, action_square_selector)
+    }
+
+}
+
 // module.exports = { }
