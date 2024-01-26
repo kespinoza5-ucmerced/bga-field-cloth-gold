@@ -32,8 +32,9 @@ class fieldofclothofgold extends Table
         parent::__construct();
        
         self::initGameStateLabels( array( 
-            "dragonIsOnHomeSpace" => 10, 
-            "revealColor" => 11,
+            "returnToHomeSpace" => 10, 
+            "evacuatedSpace" => 11,
+            "placementSpace" => 12,
         ) );
 
         $this->sack = self::getNew( "module.common.deck" );
@@ -101,10 +102,12 @@ class fieldofclothofgold extends Table
 
         // Init global values with their initial values
         //self::setGameStateInitialValue( 'my_first_global_variable', 0 );
-        self::setGameStateInitialValue( 'dragonIsOnHomeSpace', true );
+        self::setGameStateInitialValue('returnToHomeSpace', false);
         
         // Set current reveal color to zero (= no reveal color)
-        self::setGameStateInitialValue( 'revealColor', 0 );
+        self::setGameStateInitialValue('evacuatedSpace', null);
+
+        self::setGameStateInitialValue('placementSpace', null);
 
         // Create tiles
         $tiles = array ();
@@ -224,18 +227,19 @@ class fieldofclothofgold extends Table
         }
     }
 
-    function replenishTile($selected_token) {
-        if ($selected_token["loc"] == 'supply')
+    function replenishTile($evacuated_space) {
+        // came from offboard
+        if ($evacuated_space == 0)
             return false;
 
         $DRAGON = 1;
-        if ($selected_token["loc"] == $DRAGON)
+        if ($evacuated_space == $DRAGON)
             return false;
 
-        $tile = $this->sack->pickCardForLocation('deck', 'board', $selected_token['loc']);
+        $tile = $this->sack->pickCardForLocation('deck', 'board', $evacuated_space);
 
         self::notifyAllPlayers("replenishTile", clienttranslate('New ${tile_color_name} tile draw to action space ${action_name}'), array(
-            'action_id' => $selected_token['loc'],
+            'action_id' => $evacuated_space,
             'action_name' => $this->actions[$tile['location_arg']]['name'],
             'tile_color' => $tile['type_arg'],
             'tile_id' => $tile['type'],
@@ -249,8 +253,6 @@ class fieldofclothofgold extends Table
         $opponent_id = self::getNextPlayerId();
         $this->sack->moveCard($tile['id'], 'tableau', $opponent_id);
 
-        $this->debug("look here: " . json_encode($tile, JSON_PRETTY_PRINT) . " // ");
-
         // send notif to js
         $opponent_name = self::getPlayerNameById( $opponent_id );
         self::notifyAllPlayers("giveTile", clienttranslate('${opponent_name} receives ${tile_color} tile'), array(
@@ -260,6 +262,14 @@ class fieldofclothofgold extends Table
             'tile_id' => $tile['type'],
             'action_id' => $action_id
         ));
+    }
+
+    function revealTiles($reveal_color) {
+        $player_id = self::getActivePlayerId();
+        if ($reveal_color == 'gold')
+            // self::moveAllCardsInLocation('hand', 'tableau', $player_id, $player_id);
+
+        return;
     }
 
     function tokenSelectionIsValid( $player, $token, $tokens ) {
@@ -435,11 +445,16 @@ class fieldofclothofgold extends Table
         $sql = "UPDATE token SET token_selected=0 WHERE token_id=".$selected_token_id." AND token_player='".$player_id."'";
         self::DbQuery( $sql );
 
-        if ($action_id != 1)
-            self::giveTile($action_id);
+        self::setGameStateValue('placementSpace', $action_id);
 
-        // draw new tile to recently evacuated space
-        self::replenishTile($selected_token);
+        if ($selected_token["loc"] != 'supply') {
+            self::setGameStateValue('evacuatedSpace', $selected_token["loc"]);
+        }
+
+        $evacuated_space = self::getGameStateValue('evacuatedSpace');
+        if ($evacuated_space == 1) {
+            self::setGameStateValue('returnToHomeSpace', $selected_token_id);
+        }
 
         // Statistics
 
@@ -451,19 +466,19 @@ class fieldofclothofgold extends Table
             'token_id' => $selected_token_id
         ) );
         
-        // tokens left in player supply
-        $sql = "SELECT COUNT(token_id) num_tokens FROM token 
-                WHERE token_location!='supply' AND
-                    token_player='".$player_id."'";
-        $remainingNumTokens = self::getUniqueValueFromDB( $sql );
+        // // tokens left in player supply
+        // $sql = "SELECT COUNT(token_id) num_tokens FROM token 
+        //         WHERE token_location!='supply' AND
+        //             token_player='".$player_id."'";
+        // $remainingNumTokens = self::getUniqueValueFromDB( $sql );
 
-        // Notify token was used from supply
-        self::notifyAllPlayers( "tokensInSupply", '', array(
-            'player_id' => $player_id,
-            'tokensInSupply' => $remainingNumTokens
-        ) );
+        // // Notify token was used from supply
+        // self::notifyAllPlayers( "tokensInSupply", '', array(
+        //     'player_id' => $player_id,
+        //     'tokensInSupply' => $remainingNumTokens
+        // ) );
 
-        $this->gamestate->nextState( 'placedToken' );
+        $this->gamestate->nextState('performAction');
     }
 
     /*
@@ -544,7 +559,7 @@ class fieldofclothofgold extends Table
 
     function stSelectTokenFromSupply() {
         $player_id = self::getActivePlayerID();
-        // query db for player tokens in supply
+        // query or player tokens in supply
         $sql = "SELECT token_player player, MIN(token_id) id, token_location loc FROM token
                 WHERE token_location='supply' AND 
                     token_player='".$player_id."'";
@@ -585,7 +600,28 @@ class fieldofclothofgold extends Table
         return ;
     }
 
-    
+    function stPerformAction() {
+        $placement_space = self::getGameStateValue('placementSpace');
+        $evacuated_space = self::getGameStateValue('evacuatedSpace');
+
+        if ($placement_space >= 2 && $placement_space <= 7) { 
+            self::giveTile($placement_space);
+        }
+
+        $tableaus = self::DB_getPlayerTableaus();
+
+        if ($placement_space == 2)
+            self::secrecyAction();
+        if ($placement_space == 3)
+            self::goldAction();
+
+        if ($evacuated_space != NULL & $evacuated_space != 1) {
+            self::replenishTile($evacuated_space);
+        }
+
+        $this->gamestate->nextState("");
+    }
+
     /*
     
     Example for game state "MyGameState":
@@ -598,6 +634,59 @@ class fieldofclothofgold extends Table
         $this->gamestate->nextState( 'some_gamestate_transition' );
     }    
     */
+
+//////////////////////////////////////////////////////////////////////////////
+//////////// Board actions
+////////////
+
+    function secrecyAction() {
+        $player_id = self::getActivePlayerId();
+        $score = self::DB_getScore($player_id);
+        $tile_draws = [ 0 => 1, 1 => 2, 2 => 2, 3 => 3, 4 => 0 ];
+
+        $num_tiles_to_draw = $tile_draws[floor($score/8)];
+
+        // for ($i=0; $i < $num_tiles_to_draw; $i++)
+        $drawn_tiles = $this->sack->pickCards($num_tiles_to_draw, 'deck', $player_id);
+
+        $this->debug("drawn tiles: ". json_encode($drawn_tiles, JSON_PRETTY_PRINT) ." // ");
+
+        self::notifyAllPlayers("secrecyDrawPublic", clienttranslate('${player_name} draws ${num_tiles} tiles' ), array(
+            'player_name' => self::getActivePlayerName(),
+            'num_tiles' => sizeof($drawn_tiles)
+        ));
+
+        $this->notifyPlayer($player_id, "secrecyDrawPrivate", clienttranslate('${player_name} draws: '), array(
+            'player_name' => self::getActivePlayerName(),
+            'tiles' => $drawn_tiles
+        ));
+    }
+
+    function goldAction() {
+        $player_id = self::getActivePlayerId();
+
+        $tableaus = self::DB_getPlayerTableaus();
+
+        $this->debug("tableaus: ". json_encode($tableaus, JSON_PRETTY_PRINT) ." // ");
+    }
+
+//////////////////////////////////////////////////////////////////////////////
+//////////// DB functions
+////////////
+
+    function DB_getScore($player_id) {
+        return 0;
+    }
+
+    function DB_getPlayerTableaus() {
+        $sql = "SELECT card_location_arg, card_type_arg, card_id FROM card Where card_location='tableau'";
+        $tiles = self::getObjectListFromDB($sql);
+        
+        $tableaus = array();
+        // foreach ($tiles as $i => $tile) {
+        //     arr
+        // }
+    }
 
 //////////////////////////////////////////////////////////////////////////////
 //////////// Zombie
