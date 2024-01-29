@@ -496,6 +496,7 @@ function (dojo, declare) {
         
         notif_giveTile: function(notif) {
             console.log('entering notif_giveTile')
+            console.log(notif)
 
             const tile = { color: notif.args.tile_color, id: notif.args.tile_id }
             this.board[notif.args.action_id].removeTile(this, tile)

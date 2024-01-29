@@ -254,7 +254,7 @@ class fieldofclothofgold extends Table
         self::notifyAllPlayers("giveTile", clienttranslate('${player_name} receives ${tile_color} tile'), array(
             'player_name' => self::getPlayerNameById($opponent_id),
             'tile_color' => $tile['type_arg'],
-            'opponent_id' => $opponent_id,
+            'player_id' => $opponent_id,
             'tile_id' => $tile['type'],
             'action_id' => $action_id
         ));
@@ -272,8 +272,9 @@ class fieldofclothofgold extends Table
             $color_id = 3;
         if ($reveal_color == 'red')
             $color_id = 1;
+        // this is... not ideal
         if ($reveal_color == 'all')
-            throw new BgaUserException(self::_("Reveal all not implemented !!"));
+            $color_id = 100;
 
         if ($color_id == -1)
             throw new BgaUserException(self::_("discardTiles received an invalid \$reveal_color ($reveal_color)"));
@@ -669,9 +670,8 @@ class fieldofclothofgold extends Table
         $placement_space = self::getGameStateValue('placementSpace');
         $evacuated_space = self::getGameStateValue('evacuatedSpace');
 
-        if ($placement_space >= 2 && $placement_space <= 7) { 
+        if ($placement_space >= 2 && $placement_space <= 7)
             self::giveTile($placement_space);
-        }
 
         if ($placement_space == 2)
             self::secrecyAction($player_id);
@@ -683,10 +683,11 @@ class fieldofclothofgold extends Table
             self::whiteAction($player_id);
         if ($placement_space == 6)
             self::redAction($player_id, $opponent_id);
+        if ($placement_space == 7)
+            self::purpleAction($player_id);
 
-        if ($evacuated_space != NULL & $evacuated_space != 1) {
+        if ($evacuated_space != NULL & $evacuated_space != 1)
             self::replenishTile($evacuated_space);
-        }
 
         $this->gamestate->nextState("");
     }
@@ -782,6 +783,21 @@ class fieldofclothofgold extends Table
 
         self::secrecyAction($player_id);
         self::secrecyAction($opponent_id);
+    }
+
+    function purpleAction($player_id) {
+        self::revealTiles('all');
+
+        $tableaus = self::DB_getPlayerTableaus();
+        $this->debug("look here @ tableaus: " . json_encode($tableaus, JSON_PRETTY_PRINT) . " // ");
+
+        $min_tiles = INF;
+        foreach ($tableaus[$player_id] as $color_id => $tiles) {
+            $min_tiles = min(count($tiles), $min_tiles);
+        }
+
+        $points = 2 * $min_tiles;
+        self::score($player_id, $points);
     }
 
 //////////////////////////////////////////////////////////////////////////////
