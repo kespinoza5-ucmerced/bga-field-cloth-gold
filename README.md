@@ -17,6 +17,9 @@ Falls under [BGA License](https://github.com/kespinoza5-ucmerced/bga-field-cloth
   - [x] Purple action
 - [ ] Implement scoring
 - [ ] Implement undo
+- [ ] Revamp UI
+- [ ] Improve animation timing
+- [ ] Improve error handling
 
 ## Completed
 - [x] Token placement/movement
