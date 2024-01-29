@@ -77,8 +77,8 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must place a token'),
         "type" => "activeplayer",
         "args" => "argPlaceToken",
-        "possibleactions" => array( "placeToken" ),
-        "transitions" => array( "placedToken" => 40 ),
+        "possibleactions" => array("placeToken", "performAction"),
+        "transitions" => array( "placedToken" => 40, "performAction" => 20),
     ),
 
     11 => array(
@@ -91,6 +91,14 @@ $machinestates = array(
         "transitions" => array( "selectedToken" => 10 ),
     ),
 
+    20 => array(
+        "name" => "performAction",
+        "description" => "",
+        "type" => "game",
+        "action" => "stPerformAction",
+        "transitions" => array( "" => 40 )
+    ),
+    
     40 => array(
         "name" => "nextPlayer",
         "type" => "game",

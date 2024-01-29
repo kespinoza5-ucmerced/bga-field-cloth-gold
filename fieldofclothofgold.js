@@ -468,6 +468,18 @@ function (dojo, declare) {
             dojo.subscribe('replenishTile', this, "notif_replenishTile")
             this.notifqueue.setSynchronous('replenishTile', 500)
             
+            dojo.subscribe('secrecyDrawPublic', this, "notif_secrecyDrawPublic")
+            this.notifqueue.setSynchronous('notif_secrecyDrawPublic', 500)
+
+            dojo.subscribe('secrecyDrawPrivate', this, "notif_secrecyDrawPrivate")
+            this.notifqueue.setSynchronous('notif_secrecyDrawPrivate', 500)
+
+            dojo.subscribe('revealTiles', this, "notif_revealTiles")
+            this.notifqueue.setSynchronous('notif_revealTiles', 500)
+
+            dojo.subscribe('newScores', this, "notif_newScores")
+            this.notifqueue.setSynchronous('notif_newScores', 500)
+
             // Example 1: standard notification handling
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
             
@@ -501,6 +513,47 @@ function (dojo, declare) {
 
             const tile = { color: notif.args.tile_color, id: notif.args.tile_id }
             this.board[notif.args.action_id].placeTile(this, tile)
+        },
+
+        notif_secrecyDrawPublic: function(notif) {
+            console.log('entering notif_secrecyDrawPublic')
+
+            console.log(notif)
+
+            // const tile = { color: notif.args.tile_color, id: notif.args.tile_id }
+            // this.board[notif.args.action_id].placeTile(this, tile)
+        },
+
+        notif_secrecyDrawPrivate: function(notif) {
+            console.log('entering notif_secrecyDrawPrivate')
+
+            for (const i in notif.args.tiles) {
+                const color = notif.args.tiles[i].type_arg
+                const tile_id = notif.args.tiles[i].type
+                this.playerHand.addToStockWithId(color, tile_id)
+
+                // const tile = { color: notif.args.tiles[i].type_arg, id: notif.args.tiles[i].type }
+                // this.tableau[this.player_id].takeTileFromOffboard(this, tile)
+            }
+        },
+
+        notif_revealTiles: function(notif) {
+            console.log('entering notif_revealTiles')
+            console.log(notif)
+
+            for (const i in notif.args.tiles) {
+                const tile = { color: notif.args.tiles[i].card_type_arg, id: notif.args.tiles[i].card_type }
+                console.log('tile', tile)
+                this.playerHand.removeFromStockById(tile.id)
+                this.tableau[notif.args.player_id].takeTileFromHand(this, tile)
+            }
+        },
+
+        notif_newScores: function(notif) {
+            console.log('entering notif_newScores')
+            console.log(notif)
+
+            this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
         }
-   });             
+   });
 });
