@@ -10,7 +10,7 @@ Falls under [BGA License](https://github.com/kespinoza5-ucmerced/bga-field-cloth
 - [ ] Implement actions
   - [ ] Dragon action
   - [x] Secrecy action
-  - [ ] Gold action
+  - [x] Gold action
   - [ ] Blue action
   - [ ] White action
   - [ ] Red action
