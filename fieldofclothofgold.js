@@ -480,6 +480,9 @@ function (dojo, declare) {
             dojo.subscribe('newScores', this, "notif_newScores")
             this.notifqueue.setSynchronous('notif_newScores', 500)
 
+            dojo.subscribe('discardTiles', this, "notif_discardTiles")
+            this.notifqueue.setSynchronous('notif_discardTiles', 500)
+
             // Example 1: standard notification handling
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
             
@@ -496,7 +499,7 @@ function (dojo, declare) {
 
             const tile = { color: notif.args.tile_color, id: notif.args.tile_id }
             this.board[notif.args.action_id].removeTile(this, tile)
-            this.tableau[notif.args.opponent_id].takeTileFromAction(this, tile, notif.args.action_id)    
+            this.tableau[notif.args.player_id].takeTileFromAction(this, tile, notif.args.action_id)    
         },
 
         notif_moveToken: function( notif ) {
@@ -543,7 +546,6 @@ function (dojo, declare) {
 
             for (const i in notif.args.tiles) {
                 const tile = { color: notif.args.tiles[i].card_type_arg, id: notif.args.tiles[i].card_type }
-                console.log('tile', tile)
                 this.playerHand.removeFromStockById(tile.id)
                 this.tableau[notif.args.player_id].takeTileFromHand(this, tile)
             }
@@ -554,6 +556,16 @@ function (dojo, declare) {
             console.log(notif)
 
             this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
+        },
+
+        notif_discardTiles: function(notif) {
+            console.log('entering notif_discardTiles')
+            console.log(notif)
+
+            for (const i in notif.args.tiles) {
+                const tile = { color: notif.args.tiles[i].card_type_arg, id: notif.args.tiles[i].card_type }
+                this.tableau[notif.args.player_id].discardTile(this, tile)
+            }
         }
    });
 });
