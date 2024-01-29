@@ -474,6 +474,12 @@ function (dojo, declare) {
             dojo.subscribe('secrecyDrawPrivate', this, "notif_secrecyDrawPrivate")
             this.notifqueue.setSynchronous('notif_secrecyDrawPrivate', 500)
 
+            dojo.subscribe('revealTiles', this, "notif_revealTiles")
+            this.notifqueue.setSynchronous('notif_revealTiles', 500)
+
+            dojo.subscribe('newScores', this, "notif_newScores")
+            this.notifqueue.setSynchronous('notif_newScores', 500)
+
             // Example 1: standard notification handling
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
             
@@ -529,6 +535,25 @@ function (dojo, declare) {
                 // const tile = { color: notif.args.tiles[i].type_arg, id: notif.args.tiles[i].type }
                 // this.tableau[this.player_id].takeTileFromOffboard(this, tile)
             }
+        },
+
+        notif_revealTiles: function(notif) {
+            console.log('entering notif_revealTiles')
+            console.log(notif)
+
+            for (const i in notif.args.tiles) {
+                const tile = { color: notif.args.tiles[i].card_type_arg, id: notif.args.tiles[i].card_type }
+                console.log('tile', tile)
+                this.playerHand.removeFromStockById(tile.id)
+                this.tableau[notif.args.player_id].takeTileFromHand(this, tile)
+            }
+        },
+
+        notif_newScores: function(notif) {
+            console.log('entering notif_newScores')
+            console.log(notif)
+
+            this.scoreCtrl[notif.args.player_id].toValue(notif.args.score);
         }
-   });             
+   });
 });

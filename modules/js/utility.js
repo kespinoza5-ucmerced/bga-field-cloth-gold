@@ -86,6 +86,10 @@ class Tableau {
         this.tableau.addToStockWithId(tile.color, tile.id, action_square_selector)
     }
 
+    takeTileFromHand(bga, tile) {
+        this.tableau.addToStockWithId(tile.color, tile.id, 'myhand')
+    }
+
 }
 
 // module.exports = { }
