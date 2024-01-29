@@ -90,6 +90,9 @@ class Tableau {
         this.tableau.addToStockWithId(tile.color, tile.id, 'myhand')
     }
 
+    discardTile(bga, tile) {
+        this.tableau.removeFromStockById(tile.id, 'topbar')
+    }
 }
 
 // module.exports = { }

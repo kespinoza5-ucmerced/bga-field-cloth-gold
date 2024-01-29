@@ -251,11 +251,10 @@ class fieldofclothofgold extends Table
         $this->sack->moveCard($tile['id'], 'tableau', $opponent_id);
 
         // send notif to js
-        $opponent_name = self::getPlayerNameById( $opponent_id );
-        self::notifyAllPlayers("giveTile", clienttranslate('${opponent_name} receives ${tile_color} tile'), array(
-            'opponent_name' => $opponent_name,
+        self::notifyAllPlayers("giveTile", clienttranslate('${player_name} receives ${tile_color} tile'), array(
+            'player_name' => self::getPlayerNameById($opponent_id),
             'tile_color' => $tile['type_arg'],
-            'opponent_id' => $opponent_id,
+            'player_id' => $opponent_id,
             'tile_id' => $tile['type'],
             'action_id' => $action_id
         ));
@@ -263,9 +262,24 @@ class fieldofclothofgold extends Table
 
     function revealTiles($reveal_color) {
         $player_id = self::getActivePlayerId();
-        $tiles = NULL;
+
+        $color_id = -1;
         if ($reveal_color == 'gold')
-            $tiles = self::DB_getTilesFromHand($player_id, 2);
+            $color_id = 2;
+        if ($reveal_color == 'blue')
+            $color_id = 0;
+        if ($reveal_color == 'white')
+            $color_id = 3;
+        if ($reveal_color == 'red')
+            $color_id = 1;
+        // this is... not ideal
+        if ($reveal_color == 'all')
+            $color_id = 100;
+
+        if ($color_id == -1)
+            throw new BgaUserException(self::_("discardTiles received an invalid \$reveal_color ($reveal_color)"));
+
+        $tiles = self::DB_getTilesFromHand($player_id, $reveal_color, $color_id);
     
         self::DB_playTilesToTableau($player_id, $tiles);
 
@@ -278,15 +292,42 @@ class fieldofclothofgold extends Table
         ));
     }
 
-    function discardTiles($reveal_color) {
-        // 
+    function discardTiles($player_id, $tiles, $reveal_color) {
+        if ($reveal_color == 'gold')
+            return false;
+
+        if ($reveal_color == 'green')
+            return false;
+
+        $color_id = -1;
+        if ($reveal_color == 'blue')
+            $color_id = 0;
+        if ($reveal_color == 'white')
+            $color_id = 3;
+        if ($reveal_color == 'red')
+            $color_id = 1;
+        if ($reveal_color == 'all')
+            throw new BgaUserException(self::_("All discard not implemented!"));
+
+        if ($color_id == -1)
+            throw new BgaUserException(self::_("discardTiles received an invalid \$reveal_color ($reveal_color)"));
+        
+        self::DB_discardTiles($player_id, $color_id);
+
+        self::notifyAllPlayers("discardTiles", clienttranslate('${player_name} discarded ${num_tiles} ${tile_color} tiles'), array(
+            'player_name' => self::getPlayerNameById($player_id),
+            'player_id' => $player_id,
+            'num_tiles' => count($tiles),
+            'tile_color' => $reveal_color,
+            'tiles' => $tiles
+        ));
     }
 
     function score($player_id, $points) {
-        $score = self::updateScore($player_id, $points);
+        $score = self::DB_updateScore($player_id, $points);
 
         self::notifyAllPlayers("newScores", clienttranslate('${player_name} scored ${points} points'), array(
-            'player_name' => self::getActivePlayerName(),
+            'player_name' => self::getPlayerNameById($player_id),
             'player_id' => $player_id,
             'points' => $points,
             'score' => $score
@@ -593,14 +634,16 @@ class fieldofclothofgold extends Table
     }
     
     function stNextPlayer() {
+        $player_id = self::getActivePlayerId();
+        $opponent_id = self::getNextPlayerId(); 
         // TO DO: If player has reached 30 points
-        if (false) {
+        if (self::DB_getScore($player_id) >= 30 || self::DB_getScore($opponent_id) >= 30) {
             $this->gamestate->nextState('endGame');
             return ;
         }
 
         // TO DO: If bag is out of tiles
-        if (false) {
+        if (empty($this->sack->getCardsInLocation('deck'))) {
             $this->gamestate->nextState('endGame');
             return ;
         }
@@ -622,21 +665,29 @@ class fieldofclothofgold extends Table
     }
 
     function stPerformAction() {
+        $player_id = self::getActivePlayerId();
+        $opponent_id = self::getNextPlayerId();
         $placement_space = self::getGameStateValue('placementSpace');
         $evacuated_space = self::getGameStateValue('evacuatedSpace');
 
-        if ($placement_space >= 2 && $placement_space <= 7) { 
+        if ($placement_space >= 2 && $placement_space <= 7)
             self::giveTile($placement_space);
-        }
 
         if ($placement_space == 2)
-            self::secrecyAction();
+            self::secrecyAction($player_id);
         if ($placement_space == 3)
             self::goldAction();
+        if ($placement_space == 4)
+            self::blueAction($player_id);
+        if ($placement_space == 5)
+            self::whiteAction($player_id);
+        if ($placement_space == 6)
+            self::redAction($player_id, $opponent_id);
+        if ($placement_space == 7)
+            self::purpleAction($player_id);
 
-        if ($evacuated_space != NULL & $evacuated_space != 1) {
+        if ($evacuated_space != NULL & $evacuated_space != 1)
             self::replenishTile($evacuated_space);
-        }
 
         $this->gamestate->nextState("");
     }
@@ -658,8 +709,7 @@ class fieldofclothofgold extends Table
 //////////// Board actions
 ////////////
 
-    function secrecyAction() {
-        $player_id = self::getActivePlayerId();
+    function secrecyAction($player_id) {
         $score = self::DB_getScore($player_id);
         $tile_draws = [ 0 => 1, 1 => 2, 2 => 2, 3 => 3, 4 => 0 ];
 
@@ -670,11 +720,11 @@ class fieldofclothofgold extends Table
 
         self::notifyAllPlayers("secrecyDrawPublic", clienttranslate('${player_name} draws ${num_tiles} tiles' ), array(
             'player_name' => self::getActivePlayerName(),
-            'num_tiles' => sizeof($drawn_tiles)
+            'num_tiles' => count($drawn_tiles)
         ));
 
         $this->notifyPlayer($player_id, "secrecyDrawPrivate", clienttranslate('${player_name} draws: '), array(
-            'player_name' => self::getActivePlayerName(),
+            'player_name' => self::getPlayerNameById($player_id),
             'tiles' => $drawn_tiles
         ));
     }
@@ -686,10 +736,68 @@ class fieldofclothofgold extends Table
         self::revealTiles('gold');
 
         $tableaus = self::DB_getPlayerTableaus();
-        if (count($tableaus[$player_id][2]) > count($tableaus[$opponent_id][2]))
-            self::score($player_id, 2);
 
-        // discard
+        $points = 0;
+        if (count($tableaus[$player_id][2]) > count($tableaus[$opponent_id][2]))
+            $points = 2;
+
+        self::score($player_id, $points);
+    }
+
+    function blueAction($player_id) {
+        self::revealTiles('blue');
+
+        $tableaus = self::DB_getPlayerTableaus();
+
+        $points = 0;
+        if (count($tableaus[$player_id][0]) == 1)
+            $points = 1;
+        if (count($tableaus[$player_id][0]) == 2)
+            $points = 3;
+        if (count($tableaus[$player_id][0]) >= 3)
+            $points = 6;
+
+        self::score($player_id, $points);
+        self::discardTiles($player_id, $tableaus[$player_id][0], 'blue');
+    }
+
+    function whiteAction($player_id) {
+        self::revealTiles('white');
+        $tableaus = self::DB_getPlayerTableaus();
+
+        $points = count($tableaus[$player_id][3]);
+        self::score($player_id, $points);
+        self::discardTiles($player_id, $tableaus[$player_id][3], 'white');
+    }
+
+    function redAction($player_id, $opponent_id) {
+        self::revealTiles('red');
+        $tableaus = self::DB_getPlayerTableaus();
+
+        $player_points = count($tableaus[$player_id][1]);
+        $opponent_points = count($tableaus[$opponent_id][1]);
+        self::score($player_id, $player_points);
+        self::score($opponent_id, $opponent_points);
+        self::discardTiles($player_id, $tableaus[$player_id][1], 'red');
+        self::discardTiles($opponent_id, $tableaus[$opponent_id][1], 'red');
+
+        self::secrecyAction($player_id);
+        self::secrecyAction($opponent_id);
+    }
+
+    function purpleAction($player_id) {
+        self::revealTiles('all');
+
+        $tableaus = self::DB_getPlayerTableaus();
+        $this->debug("look here @ tableaus: " . json_encode($tableaus, JSON_PRETTY_PRINT) . " // ");
+
+        $min_tiles = INF;
+        foreach ($tableaus[$player_id] as $color_id => $tiles) {
+            $min_tiles = min(count($tiles), $min_tiles);
+        }
+
+        $points = 2 * $min_tiles;
+        self::score($player_id, $points);
     }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -702,7 +810,7 @@ class fieldofclothofgold extends Table
     }
 
     function DB_getPlayerTableaus() {
-        $sql = "SELECT card_location_arg, card_type_arg, card_id FROM card WHERE card_location='tableau'";
+        $sql = "SELECT card_location_arg, card_type_arg, card_id, card_type FROM card WHERE card_location='tableau'";
         $tiles = self::getObjectListFromDB($sql);
         $test = self::getDoubleKeyCollectionFromDB($sql);
 
@@ -736,8 +844,8 @@ class fieldofclothofgold extends Table
         return $tableaus;
     }
 
-    function DB_getTilesFromHand($player_id, $color_id=NULL) {
-        if ($color_id == NULL) {
+    function DB_getTilesFromHand($player_id, $reveal_color, $color_id) {
+        if ($reveal_color == 'all') {
             $sql = "SELECT * FROM card 
                     WHERE card_location='hand' AND card_location_arg=$player_id";
             return self::getObjectListFromDB($sql);
@@ -756,11 +864,18 @@ class fieldofclothofgold extends Table
         }
     }
 
-    function updateScore($player_id, $points) {
+    function DB_updateScore($player_id, $points) {
         $score = self::DB_getScore($player_id) + $points;
         $sql = "UPDATE player SET player_score=$score WHERE player_id=$player_id";
         self::DbQuery($sql);
         return $score;
+    }
+
+    function DB_discardTiles($player_id, $color_id) {
+        $sql = "UPDATE card SET card_location='discard', card_location_arg=-1 
+                WHERE card_location='tableau' AND card_location_arg=$player_id AND
+                    card_type_arg=$color_id";
+        self::DbQuery($sql);
     }
 
 //////////////////////////////////////////////////////////////////////////////
