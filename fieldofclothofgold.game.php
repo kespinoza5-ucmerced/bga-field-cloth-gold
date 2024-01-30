@@ -32,7 +32,7 @@ class fieldofclothofgold extends Table
         parent::__construct();
        
         self::initGameStateLabels( array( 
-            "returnToHomeSpace" => 10, 
+            "dragonOccupiedSpace" => 10, 
             "evacuatedSpace" => 11,
             "placementSpace" => 12,
         ) );
@@ -102,12 +102,6 @@ class fieldofclothofgold extends Table
 
         // Init global values with their initial values
         //self::setGameStateInitialValue( 'my_first_global_variable', 0 );
-        self::setGameStateInitialValue('returnToHomeSpace', false);
-        
-        // Set current reveal color to zero (= no reveal color)
-        self::setGameStateInitialValue('evacuatedSpace', null);
-
-        self::setGameStateInitialValue('placementSpace', null);
 
         // Create tiles
         $tiles = array ();
@@ -170,6 +164,7 @@ class fieldofclothofgold extends Table
         $result['tokens'] = self::getTokens();
         $result['tilesonboard'] = $this->sack->getCardsInLocation( 'board' );
         $result['actions'] = $this->actions;
+        $result['dragon'] = self::getGameStateValue('dragonOccupiedSpace');
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
         // Cards in player hand
@@ -245,6 +240,9 @@ class fieldofclothofgold extends Table
     }
 
     function giveTile($action_id) {
+        if ($action_id == 0)
+            return false;
+
         $tile = self::getTileFromSpace($action_id);
 
         $opponent_id = self::getNextPlayerId();
@@ -334,6 +332,20 @@ class fieldofclothofgold extends Table
         ));
     }
 
+    function returnDragonHome($action_id) {
+        self::DB_returnDragonHome($action_id);
+        self::setGameStateValue('dragonOccupiedSpace', 0);
+
+        self::notifyAllPlayers( "moveDragon", clienttranslate('${player_name} moves dragon to ${action_id}'), array(
+            'player_name' => self::getActivePlayerName(),
+            'action_id' => 0,
+            'player_id' => 'dragon',
+            'token_id' => 1
+        ));
+
+        return $action_id;
+    }
+
     function tokenSelectionIsValid( $player, $token, $tokens ) {
         if ( ! array_key_exists( $player, $tokens) )
         {
@@ -347,6 +359,16 @@ class fieldofclothofgold extends Table
 
         return true;
     }   
+
+    function dragonPlacementIsValid($action_id, $vacated_space, $board) {
+        if ($board[$action_id]['player'] != null )
+            return false;
+
+        if ($board[$action_id] == $vacated_space)
+            return false;
+
+        return true;
+    }
 
     function tokenPlacementIsValid( $action_id, $board ) {
         if (! array_key_exists($action_id, $board)) {
@@ -431,6 +453,19 @@ class fieldofclothofgold extends Table
         return $result;
     }
 
+    function getPossibleDragonPlacements() {
+        $result = array();
+
+        $board = self::getBoard();
+
+        $evacuated_space = self::getGameStateValue('evacuatedSpace');
+        foreach ($board as $id => $action)
+            if ($action['player'] == NULL && $id != $evacuated_space)
+                $result[$action['id']] = $action['id'];
+        
+        return $result;
+    }
+
 //////////////////////////////////////////////////////////////////////////////
 //////////// Player actions
 //////////// 
@@ -474,6 +509,29 @@ class fieldofclothofgold extends Table
         // throw new BgaUserException(self::_("Not implemented: ") . "token $player_id - $token_id placed");
     }
 
+    function placeDragon($action_id) {
+        self::checkAction("placeDragon");
+        $player_id = self::getActivePlayerId();
+        $vacated_space = self::getGameStateValue('evacuatedSpace');
+
+        $board = self::getBoard();
+
+        if (! self::dragonPlacementIsValid($action_id, $vacated_space, $board))
+            throw new BgaUserException(self::_("Move not valid: ") . "$player_id places at $action_id");
+
+        self::DB_placeTokenOnBoard('dragon', 1, $action_id);
+        self::setGameStateValue('dragonOccupiedSpace', $action_id);
+
+        self::notifyAllPlayers( "moveDragon", clienttranslate('${player_name} moves dragon to ${action_id}'), array(
+            'player_name' => self::getActivePlayerName(),
+            'action_id' => $action_id,
+            'player_id' => $player_id,
+            'token_id' => 1
+        ));
+
+        $this->gamestate->nextState("");
+    }
+
     function placeToken($action_id) {
         self::checkAction("placeToken");
         $player_id = self::getActivePlayerId();
@@ -514,9 +572,9 @@ class fieldofclothofgold extends Table
         }
 
         $evacuated_space = self::getGameStateValue('evacuatedSpace');
-        if ($evacuated_space == 1) {
-            self::setGameStateValue('returnToHomeSpace', $selected_token_id);
-        }
+        // if ($evacuated_space == 1) {
+        //     self::setGameStateValue('dragonOccupiedSpace', $selected_token_id);
+        // }
 
         // Statistics
 
@@ -540,7 +598,10 @@ class fieldofclothofgold extends Table
         //     'tokensInSupply' => $remainingNumTokens
         // ) );
 
-        $this->gamestate->nextState('performAction');
+        $state = 'performAction';
+        if ($action_id == 1)
+            $state = 'placeDragon';
+        $this->gamestate->nextState($state);
     }
 
     /*
@@ -579,6 +640,12 @@ class fieldofclothofgold extends Table
         These methods function is to return some additional information that is specific to the current
         game state.
     */
+
+    function argPlaceDragon() {
+        return array (
+            'possibleMoves' => self::getPossibleDragonPlacements()
+        );
+    }
 
     function argPlaceToken() {
         return array (
@@ -669,9 +736,15 @@ class fieldofclothofgold extends Table
         $opponent_id = self::getNextPlayerId();
         $placement_space = self::getGameStateValue('placementSpace');
         $evacuated_space = self::getGameStateValue('evacuatedSpace');
+        $dragonoccupied_space = self::getGameStateValue('dragonOccupiedSpace');
 
+        $gift_space = 0;
         if ($placement_space >= 2 && $placement_space <= 7)
-            self::giveTile($placement_space);
+            $gift_space = $placement_space;
+        if ($placement_space == 1 && $dragonoccupied_space != 0)
+            $gift_space = $dragonoccupied_space;
+        // throw new BgaUserException(self::_("gift at space ").$gift_space);
+        self::giveTile($gift_space);
 
         if ($placement_space == 2)
             self::secrecyAction($player_id);
@@ -686,8 +759,16 @@ class fieldofclothofgold extends Table
         if ($placement_space == 7)
             self::purpleAction($player_id);
 
-        if ($evacuated_space != NULL & $evacuated_space != 1)
-            self::replenishTile($evacuated_space);
+        // return dragon home
+        if ($evacuated_space == 1)
+            self::returnDragonHome($dragonoccupied_space);
+
+        $replenish_space = 0;
+        if ($evacuated_space != 0 && $evacuated_space != 1)
+            $replenish_space = $evacuated_space;
+        if ($evacuated_space == 1)
+            $replenish_space = $dragonoccupied_space;
+        self::replenishTile($replenish_space);
 
         $this->gamestate->nextState("");
     }
@@ -875,6 +956,17 @@ class fieldofclothofgold extends Table
         $sql = "UPDATE card SET card_location='discard', card_location_arg=-1 
                 WHERE card_location='tableau' AND card_location_arg=$player_id AND
                     card_type_arg=$color_id";
+        self::DbQuery($sql);
+    }
+
+    function DB_returnDragonHome($action_id) {
+        $sql = "UPDATE board SET board_player=NULL, board_token=NULL WHERE board_player='dragon'";
+        self::DbQuery($sql);
+    }
+
+    function DB_placeTokenOnBoard($player_id, $token_id, $action_id) {
+        $sql = "UPDATE board SET board_player='$player_id', board_token=$token_id 
+                WHERE board_id=$action_id";
         self::DbQuery($sql);
     }
 

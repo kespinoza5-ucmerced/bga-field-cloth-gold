@@ -90,9 +90,15 @@ function (dojo, declare) {
             //     this.playTileOnTable(player_id, tile.id, tile.stock_id);
             // }
 
+            let token = { color: 'ffffff', player: 'dragon', id: 1 }
+            this.placeToken(token)
+
+            if (gamedatas.dragon == 0)
+                this.slideToObject('token_dragon_1', 'circle_action_0').play()
+
             for (const player_id in this.gamedatas.tokens)
                 for (const token_id in this.gamedatas.tokens[player_id])
-                    this.placeTokenInSupply(this.gamedatas.tokens[player_id][token_id])
+                    this.placeTokenInSupply(this.gamedatas.tokens[player_id][token_id], this.gamedatas.players[player_id].color)
 
             for (const action_id in gamedatas.board) {
                 const action_space = gamedatas.board[action_id]
@@ -135,50 +141,51 @@ function (dojo, declare) {
         // onEnteringState: this method is called each time we are entering into a new game state.
         //                  You can use this method to perform some user interface changes at this moment.
         //
-        onEnteringState: function( stateName, args )
-        {
-            console.log( 'Entering state: '+stateName );
+        onEnteringState: function(stateName, args) {
+            console.log('Entering state: '+stateName)
+            console.log(args)
             
-            switch( stateName )
-            {        
+            switch(stateName) {
+                case 'placeDragon':
+                    if (this.player_id == args.active_player)
+                        this.updatePossibleMoves(args.args.possibleMoves)
+
+                    this.last_server_state.name = stateName
+                    break
+
                 case 'placeToken':
-                    if ( this.player_id == args.active_player ) 
-                    {
-                        this.updatePossibleMoves( args.args.possibleMoves );
-                    }
+                    if (this.player_id == args.active_player)
+                        this.updatePossibleMoves(args.args.possibleMoves)
 
-                    break;
-                    
+                    this.last_server_state.name = stateName
+                    break
+
                 case 'selectToken':
-                    if ( this.player_id == args.active_player ) 
-                    {
-                        this.updatePossibleSelects( args.args.possibleSelects );
-                    }
-
-                    break;
+                    if (this.player_id == args.active_player)
+                        this.updatePossibleSelects( args.args.possibleSelects )
+                    break
             }
         },
 
         // onLeavingState: this method is called each time we are leaving a game state.
         //                 You can use this method to perform some user interface changes at this moment.
         //
-        onLeavingState: function( stateName )
-        {
-            console.log( 'Leaving state: '+stateName );
-            
-            
+        onLeavingState: function(stateName) {
+            console.log('Leaving state: '+stateName);
 
-            switch( stateName )
-            {       
+            switch(stateName) {
+                case 'placeDragon':
+                    dojo.query('.possible_move').removeClass('possible_move')
+                    break
+
                 case 'placeToken':        
-                    dojo.query( '.possible_move' ).removeClass( 'possible_move' );            
-                    break;
+                    dojo.query('.possible_move').removeClass('possible_move')
+                    break
 
                 case 'selectToken':
-                    dojo.query( '.possible_select' ).removeClass( 'possible_select' );
-
-                    break;
-            }               
+                    dojo.query('.possible_select').removeClass('possible_select')
+                    break
+            }
         }, 
 
         // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
@@ -236,9 +243,21 @@ function (dojo, declare) {
             }
         },
 
-        placeTokenInSupply: function(token) {
+        placeToken: function(token) {
             dojo.place(this.format_block('jstpl_token', {
-                color: this.gamedatas.players[token.player].color,
+                color: token.color,
+                player_id: token.player,
+                token_id: token.id
+            }), 'tokens')
+
+            const token_selector = 'token_'+token.player+'_'+token.id
+            const board_selector = 'topbar'
+            this.placeOnObject(token_selector, board_selector)
+        },
+
+        placeTokenInSupply: function(token, color) {
+            dojo.place(this.format_block('jstpl_token', {
+                color: color,
                 player_id: token.player,
                 token_id: token.id
             }), 'tokens')
@@ -366,7 +385,7 @@ function (dojo, declare) {
             //     return ;
             // }
 
-            var action = 'placeToken';
+            var action = this.last_server_state.name;
             console.log("on "+action+" to "+x);
 
             if (this.checkAction(action, true)) {
@@ -483,6 +502,9 @@ function (dojo, declare) {
             dojo.subscribe('discardTiles', this, "notif_discardTiles")
             this.notifqueue.setSynchronous('notif_discardTiles', 500)
 
+            dojo.subscribe('moveDragon', this, "notif_moveDragon")
+            this.notifqueue.setSynchronous('notif_moveDragon', 500)
+
             // Example 1: standard notification handling
             // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
             
@@ -567,6 +589,13 @@ function (dojo, declare) {
                 const tile = { color: notif.args.tiles[i].card_type_arg, id: notif.args.tiles[i].card_type }
                 this.tableau[notif.args.player_id].discardTile(this, tile)
             }
+        },
+
+        notif_moveDragon: function(notif) {
+            console.log('entering notif_moveDragon')
+            console.log(notif)
+
+            this.slideToObject('token_dragon_1', 'circle_action_'+notif.args.action_id).play()
         }
    });
 });
