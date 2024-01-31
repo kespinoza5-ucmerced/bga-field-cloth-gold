@@ -48,6 +48,13 @@
     //     self::ajaxResponse();
     // }
 
+    public function placeDragon() {
+        self::setAjaxMode();
+        $action_id = self::getArg("x", AT_alphanum, true);
+        $this->game->placeDragon($action_id);
+        self::ajaxResponse();
+    }
+
     public function placeToken() {
         self::setAjaxMode();
         $oval_id = self::getArg("x", AT_alphanum, true);

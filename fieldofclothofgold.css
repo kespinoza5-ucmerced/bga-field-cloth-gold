@@ -77,8 +77,6 @@
     height: 36px;
     border-radius: 50%;
     position: absolute;
-    border-style: solid;
-    border-color: #ff0000;
 }
 
 .possible_move {
