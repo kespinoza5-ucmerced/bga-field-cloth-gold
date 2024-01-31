@@ -7,14 +7,6 @@ Falls under [BGA License](https://github.com/kespinoza5-ucmerced/bga-field-cloth
 
 # Project Progress
 ##  To-do
-- [ ] Implement actions
-  - [ ] Dragon action
-  - [x] Secrecy action
-  - [x] Gold action
-  - [x] Blue action
-  - [x] White action
-  - [x] Red action
-  - [x] Purple action
 - [ ] Implement scoring
 - [ ] Implement undo
 - [ ] Revamp UI
@@ -22,6 +14,14 @@ Falls under [BGA License](https://github.com/kespinoza5-ucmerced/bga-field-cloth
 - [ ] Improve error handling
 
 ## Completed
+- [x] Implement actions
+  - [x] Dragon action
+  - [x] Secrecy action
+  - [x] Gold action
+  - [x] Blue action
+  - [x] White action
+  - [x] Red action
+  - [x] Purple action
 - [x] Token placement/movement
 - [x] Tile redraw
 - [x] Tile gifting
