@@ -7,11 +7,13 @@ Falls under [BGA License](https://github.com/kespinoza5-ucmerced/bga-field-cloth
 
 # Project Progress
 ##  To-do
+### Basic features
 - [ ] Implement scoring
+- [ ] Improve error handling
+### Quality of life
 - [ ] Implement undo
 - [ ] Revamp UI
 - [ ] Improve animation timing
-- [ ] Improve error handling
 
 ## Completed
 - [x] Implement actions
