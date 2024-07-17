@@ -37,13 +37,11 @@ To initialize development environment, run:
 npm i
 ```
 
+## Setup file sync
+Project files are hosted remotely and can be accessed and modified through SFTP (can be set up using this guide https://en.doc.boardgamearena.com/Setting_up_BGA_Development_environment_using_VSCode#File_Sync).
+
 ## Run project
 This project cannot be run locally, and must instead be run from BGA servers. Create a developer account and a new project (using this guide https://boardgamearena.com/doc/First_steps_with_BGA_Studio).
-
-## Setup file sync
-Project files are hosted remotely and can be accessed and modified through SFTP (can be set up using this guide https://boardgamearena.com/doc/Tools_and_tips_of_BGA_Studio#File_sync).
-
-**Note**: Highly recommended to use the `| .git/; node_modules/` file mask to improve sync times and reduce server use.
 
 # Test
 Testing is accomplished through `jest`. Test suite validates helper functions in the `modules/js` directory.
