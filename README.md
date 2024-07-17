@@ -43,7 +43,7 @@ Project files are hosted remotely and can be accessed and modified through SFTP 
 ## Run project
 This project cannot be run locally, and must instead be run from BGA servers. Create a developer account and a new project (using this guide https://boardgamearena.com/doc/First_steps_with_BGA_Studio).
 
-# Test
+## Test
 Testing is accomplished through `jest`. Test suite validates helper functions in the `modules/js` directory.
 
 To execute test suite, run:
