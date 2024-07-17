@@ -1,3 +1,5 @@
-doc/
+.*
+
 img/
+misc/
 node_modules/
