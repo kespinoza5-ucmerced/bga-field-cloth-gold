@@ -3,3 +3,5 @@
 img/
 misc/
 node_modules/
+
+!.vscode
