@@ -5,29 +5,6 @@ Digital adaptation of the 2-player board game [The Field of Cloth of Gold](https
 # License
 Falls under [BGA License](https://github.com/kespinoza5-ucmerced/bga-field-cloth-gold/blob/main/LICENCE_BGA).
 
-# Project Progress
-##  To-do
-### Basic features
-- [ ] Implement scoring
-- [ ] Improve error handling
-### Quality of life
-- [ ] Implement undo
-- [ ] Revamp UI
-- [ ] Improve animation timing
-
-## Completed
-- [x] Implement actions
-  - [x] Dragon action
-  - [x] Secrecy action
-  - [x] Gold action
-  - [x] Blue action
-  - [x] White action
-  - [x] Red action
-  - [x] Purple action
-- [x] Token placement/movement
-- [x] Tile redraw
-- [x] Tile gifting
-
 # Development
 ## Initialize development environment
 Requires `node` and `npm`. 
